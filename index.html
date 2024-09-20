@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Script-Wiewer</title>
+    <title>Script-Viewer-Roblox</title>
     <style>
         /* Thiết lập mặc định */
         * {
@@ -89,6 +89,60 @@
             margin: 0 auto;
         }
 
+        /* Thanh tìm kiếm */
+        .search-container {
+            margin: 20px 0;
+        }
+
+        .search-container input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-container button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-container button:hover {
+            background-color: #45a049;
+        }
+
+        /* Hộp textbox */
+        .script-box {
+            width: 100%;
+            max-width: 600px;
+            height: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-family: monospace;
+            overflow: auto;
+            resize: none;
+            white-space: pre-wrap; /* Để giữ định dạng */
+        }
+
+        .copy-button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .copy-button:hover {
+            background-color: #0056b3;
+        }
+
         /* Hiệu ứng chuyển động nhẹ khi cuộn */
         section {
             opacity: 0;
@@ -119,7 +173,7 @@
 
     <!-- Phần header -->
     <header>
-        <h1>ScriptWebHub</h1>
+        <h1>Script-Viewer-Roblox</h1>
     </header>
 
     <!-- Menu điều hướng -->
@@ -133,13 +187,26 @@
     <!-- Mục Home -->
     <section id="home">
         <h1>Trang Chủ</h1>
-        <p>Chào mừng bạn đến với Script-Web-Wiewer!</p>
+        <p>Chào mừng bạn đến với trang web của chúng tôi! Tại đây, bạn có thể khám phá các đoạn mã, công cụ thực thi, và nhiều thông tin thú vị khác.</p>
     </section>
 
     <!-- Mục Script -->
     <section id="script">
         <h1>Script</h1>
         <p>Đây là nơi chứa các đoạn mã script của bạn, bao gồm các đoạn mã thú vị để bạn tham khảo và thực hiện.</p>
+
+        <!-- Thanh tìm kiếm -->
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Tìm kiếm script...">
+            <button onclick="searchScript()">Tìm kiếm</button>
+        </div>
+
+        <!-- Hộp textbox cho script -->
+        <textarea class="script-box" id="scriptBox" readonly>
+-- Đây là một ví dụ script Roblox
+print("Hello, Roblox!")
+        </textarea>
+        <button class="copy-button" onclick="copyScript()">Copy Script</button>
     </section>
 
     <!-- Mục Executor -->
@@ -151,12 +218,12 @@
     <!-- Mục Contact -->
     <section id="contact">
         <h1>Contact</h1>
-        <p>Liên hệ với chúng tôi qua email: lminhtu088@email.com.</p>
+        <p>Liên hệ với chúng tôi qua email: example@email.com hoặc theo dõi chúng tôi trên các mạng xã hội để cập nhật thông tin mới nhất.</p>
     </section>
 
     <!-- Footer -->
     <footer>
-        <p>&copy; 2024 ScriptHubRoblox-Executor. All Rights Reserved.</p>
+        <p>&copy; 2024 Script-Viewer-Roblox. All Rights Reserved.</p>
     </footer>
 
     <!-- JavaScript để tạo hiệu ứng khi cuộn -->
@@ -177,6 +244,25 @@
                     section.classList.remove('active');
                 }
             });
+        }
+
+        function copyScript() {
+            const scriptBox = document.getElementById('scriptBox');
+            scriptBox.select();
+            document.execCommand('copy');
+            alert("Đã sao chép script!");
+        }
+
+        function searchScript() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const scriptBox = document.getElementById('scriptBox');
+            const scriptContent = scriptBox.value.toLowerCase();
+
+            if (scriptContent.includes(input)) {
+                alert("Tìm thấy script!");
+            } else {
+                alert("Không tìm thấy script nào!");
+            }
         }
     </script>
 
