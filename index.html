@@ -42,8 +42,32 @@
     </section>
 
     <section id="settings">
-        <h2>Settings</h2>
-        <p>Customize your experience here.</p>
+    <h2>Settings</h2>
+
+    <div class="settings-option">
+        <label for="themeSelect">Choose Theme:</label>
+        <select id="themeSelect" onchange="changeTheme(this.value)">
+            <option value="galaxy">Galaxy</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+        </select>
+    </div>
+
+    <div class="settings-option">
+        <label for="fontSelect">Choose Font:</label>
+        <select id="fontSelect" onchange="changeFont(this.value)">
+            <option value="'Poppins', sans-serif">Poppins</option>
+            <option value="'Roboto', sans-serif">Roboto</option>
+            <!-- Thêm nhiều font khác -->
+        </select>
+    </div>
+
+    <div class="settings-option">
+        <h3>Choose Language:</h3>
+        <div id="languageList">
+            <!-- Danh sách ngôn ngữ sẽ được tạo động -->
+        </div>
+    </div>
     </section>
 
     <footer>
