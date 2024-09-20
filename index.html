@@ -143,6 +143,25 @@
             background-color: #0056b3;
         }
 
+        /* Danh sách executor */
+        .executor-item {
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        .download-button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .download-button:hover {
+            background-color: #218838;
+        }
+
         /* Hiệu ứng chuyển động nhẹ khi cuộn */
         section {
             opacity: 0;
@@ -204,14 +223,14 @@
         <!-- Danh sách script -->
         <div id="scriptList">
             <div class="script-item">
-                <h3>Script 1...</h3>
+                <h3>Script 1: ...</h3>
                 <textarea class="script-box" id="scriptBox1" readonly>
 
                 </textarea>
                 <button class="copy-button" onclick="copyScript('scriptBox1')">Copy Script</button>
             </div>
             <div class="script-item">
-                <h3>Script 2...</h3>
+                <h3>Script 2: ...</h3>
                 <textarea class="script-box" id="scriptBox2" readonly>
 
 end
@@ -224,7 +243,29 @@ end
     <!-- Mục Executor -->
     <section id="executor">
         <h1>Executor</h1>
-        <p>Đây là công cụ thực thi mã của bạn. Bạn có thể sử dụng các đoạn mã đã nhập để kiểm tra và chạy chúng ngay tại đây.</p>
+        <p>Danh sách các executor Roblox, bạn có thể tải xuống chúng.</p>
+
+        <!-- Thanh tìm kiếm -->
+        <div class="search-container">
+            <input type="text" id="executorSearchInput" placeholder="Tìm kiếm executor...">
+            <button onclick="searchExecutor()">Tìm kiếm</button>
+        </div>
+
+        <!-- Danh sách executor -->
+        <div id="executorList">
+            <div class="executor-item">
+                <h3>Executor 1: Synapse X</h3>
+                <button class="download-button" onclick="window.location.href='https://www.synapse-x.com/download'">Tải xuống</button>
+            </div>
+            <div class="executor-item">
+                <h3>Executor 2: Krnl</h3>
+                <button class="download-button" onclick="window.location.href='https://krnl.place/download'">Tải xuống</button>
+            </div>
+            <div class="executor-item">
+                <h3>Executor 3: Fluxus</h3>
+                <button class="download-button" onclick="window.location.href='https://fluxteam.org/'">Tải xuống</button>
+            </div>
+        </div>
     </section>
 
     <!-- Mục Contact -->
@@ -275,6 +316,20 @@ end
                     script.style.display = 'block';
                 } else {
                     script.style.display = 'none';
+                }
+            });
+        }
+
+        function searchExecutor() {
+            const input = document.getElementById('executorSearchInput').value.toLowerCase();
+            const executors = document.querySelectorAll('.executor-item');
+
+            executors.forEach(executor => {
+                const title = executor.querySelector('h3').textContent.toLowerCase();
+                if (title.includes(input)) {
+                    executor.style.display = 'block';
+                } else {
+                    executor.style.display = 'none';
                 }
             });
         }
