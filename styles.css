@@ -1,6 +1,7 @@
-/* Đặt font đẹp từ Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+/* Font từ Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto:wght@400;700&display=swap');
 
+/* Mặc định là nền galaxy */
 body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
@@ -8,10 +9,22 @@ body {
     background: url('https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3') no-repeat center center fixed;
     background-size: cover;
     color: white;
-    overflow-x: hidden;
+    transition: all 0.3s ease;
 }
 
-/* Thay đổi giao diện cho header và nav */
+/* Chế độ sáng */
+body.light-mode {
+    background: #f0f0f0;
+    color: black;
+}
+
+/* Chế độ tối */
+body.dark-mode {
+    background: #121212;
+    color: white;
+}
+
+/* Cấu trúc header */
 header {
     background: rgba(0, 0, 0, 0.8);
     padding: 10px 0;
@@ -19,6 +32,7 @@ header {
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
 }
 
+/* Cấu trúc nav */
 nav ul {
     list-style-type: none;
     margin: 0;
@@ -43,43 +57,20 @@ nav ul li a:hover {
     color: #00d4ff;
 }
 
-/* Cấu trúc các phần chính */
-section {
-    padding: 60px 20px;
-    margin: 20px auto;
-    width: 80%;
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    text-align: center;
-}
-
-h1, h2 {
-    font-weight: 600;
-    color: #00d4ff;
-    letter-spacing: 1px;
-}
-
-h3 {
-    font-size: 22px;
-    color: #fff;
-}
-
-p {
+/* Giao diện nút bấm và hộp tìm kiếm */
+button, input[type="text"] {
+    border-radius: 25px;
+    border: none;
     font-size: 16px;
-    color: #ddd;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-/* Thay đổi giao diện cho nút bấm */
 button {
     background-color: #00d4ff;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 25px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    color: white;
+    margin: 10px;
 }
 
 button:hover {
@@ -88,16 +79,11 @@ button:hover {
 }
 
 input[type="text"] {
-    padding: 10px;
-    border-radius: 25px;
-    border: 2px solid #00d4ff;
     width: 60%;
-    font-size: 16px;
-    margin-bottom: 20px;
     background: rgba(255, 255, 255, 0.1);
     color: white;
     text-align: center;
-    outline: none;
+    border: 2px solid #00d4ff;
 }
 
 input[type="text"]::placeholder {
@@ -108,36 +94,36 @@ input[type="text"]:focus {
     border-color: #007bff;
 }
 
-/* Thay đổi giao diện danh sách script và executor */
-.script-list, .executor-list {
+/* Thẻ chọn giao diện Settings */
+#settings {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.settings-option {
+    margin-bottom: 20px;
+}
+
+.settings-option select {
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid #00d4ff;
+}
+
+/* Tùy chỉnh danh sách ngôn ngữ với cờ */
+.language-select {
     display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
+    align-items: center;
+    margin: 5px 0;
 }
 
-.script, .executor {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    width: 28%;
-    border-radius: 15px;
-    text-align: center;
-    margin: 20px 0;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s;
+.language-select img {
+    margin-right: 10px;
 }
 
-.script:hover, .executor:hover {
-    transform: translateY(-10px);
+/* Tùy chỉnh danh sách flag (cờ) */
+.language-option {
+    display: inline-block;
+    margin: 10px;
+    cursor: pointer;
 }
-
-/* Chỉnh footer */
-footer {
-    text-align: center;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.9);
-    color: white;
-    position: relative;
-    bottom: 0;
-    width: 100%;
-    box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.5);
-    }
