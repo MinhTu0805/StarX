@@ -21,7 +21,7 @@
         /* Phần header */
         header {
             background-color: #4CAF50;
-            padding: 20px 0;
+            padding: 20px;
             text-align: center;
             color: white;
         }
@@ -35,6 +35,7 @@
             background-color: #333;
             display: flex;
             justify-content: center;
+            flex-wrap: wrap; /* Để cho các mục tự động xuống dòng trên màn hình nhỏ */
             padding: 10px 0;
         }
 
@@ -96,7 +97,8 @@
 
         .search-container input[type="text"] {
             padding: 10px;
-            width: 300px;
+            width: 100%;
+            max-width: 300px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
@@ -117,7 +119,7 @@
         /* Hộp textbox */
         .script-box {
             width: 100%;
-            max-width: 600px;
+            max-width: 100%;
             height: 200px;
             padding: 10px;
             border: 1px solid #ccc;
@@ -200,6 +202,54 @@
             font-size: 1em;
         }
 
+        /* Media Queries để tối ưu trên các thiết bị */
+        @media (max-width: 1200px) {
+            header h1 {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            nav a {
+                font-size: 1em;
+                margin: 0 10px;
+            }
+
+            section h1 {
+                font-size: 1.8em;
+            }
+
+            section p {
+                font-size: 1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            nav a {
+                font-size: 0.9em;
+                margin: 0 8px;
+            }
+
+            section h1 {
+                font-size: 1.5em;
+            }
+
+            section p {
+                font-size: 0.9em;
+            }
+
+            .search-container input[type="text"] {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -221,7 +271,7 @@
     <!-- Mục Home -->
     <section id="home">
         <h1>Trang Chủ</h1>
-        <p>Chào mừng bạn đến với Script-Wiewer-Roblox!</p>
+        <p>Chào mừng bạn đến với trang web của chúng tôi! Tại đây, bạn có thể khám phá các đoạn mã, công cụ thực thi, và nhiều thông tin thú vị khác.</p>
     </section>
 
     <!-- Mục Script -->
@@ -268,16 +318,12 @@
         <!-- Danh sách executor -->
         <div id="executorList">
             <div class="executor-item">
-                <h3>Executor 1: Synapse X</h3>
-                <button class="download-button" onclick="window.location.href='https://www.synapse-x.com/download'">Tải xuống</button>
+                <h3>KRNL</h3>
+                <button class="download-button" onclick="window.location.href='https://example.com/download-krnl'">Download</button>
             </div>
             <div class="executor-item">
-                <h3>Executor 2: Krnl</h3>
-                <button class="download-button" onclick="window.location.href='https://krnl.place/download'">Tải xuống</button>
-            </div>
-            <div class="executor-item">
-                <h3>Executor 3: Fluxus</h3>
-                <button class="download-button" onclick="window.location.href='https://fluxteam.org/'">Tải xuống</button>
+                <h3>Synapse X</h3>
+                <button class="download-button" onclick="window.location.href='https://example.com/download-synapse'">Download</button>
             </div>
         </div>
     </section>
@@ -285,7 +331,7 @@
     <!-- Mục Discord -->
     <section id="discord">
         <h1>Discord</h1>
-        <p>Tham gia cộng đồng của chúng tôi trên Discord để cập nhật thông tin mới nhất về script và Roblox!</p>
+        <p>Tham gia cộng đồng Discord của chúng tôi để cập nhật các tin tức mới nhất!</p>
         <button class="discord-button" onclick="window.location.href='https://discord.com/invite/jFydwZJ6'">Tham gia Discord</button>
     </section>
 
@@ -300,7 +346,7 @@
         <p>&copy; 2024 Script-Viewer-Roblox. All Rights Reserved.</p>
     </footer>
 
-    <!-- JavaScript để tạo hiệu ứng khi cuộn -->
+    <!-- JavaScript -->
     <script>
         const sections = document.querySelectorAll('section');
 
