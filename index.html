@@ -1,1 +1,184 @@
-Update ScriptWeb
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Web Đẹp</title>
+    <style>
+        /* Thiết lập mặc định */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        /* Phần header */
+        header {
+            background-color: #4CAF50;
+            padding: 20px 0;
+            text-align: center;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+        }
+
+        /* Phần menu điều hướng */
+        nav {
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.2em;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: #4CAF50;
+        }
+
+        nav a::after {
+            content: "";
+            display: block;
+            width: 0;
+            height: 2px;
+            background: #4CAF50;
+            transition: width 0.3s;
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Thiết kế các section */
+        section {
+            padding: 60px 20px;
+            text-align: center;
+            background-color: white;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        section h1 {
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+
+        section p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Hiệu ứng chuyển động nhẹ khi cuộn */
+        section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+
+        section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Phần liên hệ (footer) */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        footer p {
+            font-size: 1em;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Phần header -->
+    <header>
+        <h1>Trang Web Đẹp</h1>
+    </header>
+
+    <!-- Menu điều hướng -->
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#script">Script</a>
+        <a href="#executor">Executor</a>
+        <a href="#contact">Contact</a>
+    </nav>
+
+    <!-- Mục Home -->
+    <section id="home">
+        <h1>Trang Chủ</h1>
+        <p>Chào mừng bạn đến với trang web của chúng tôi! Tại đây, bạn có thể khám phá các đoạn mã, công cụ thực thi, và nhiều thông tin thú vị khác.</p>
+    </section>
+
+    <!-- Mục Script -->
+    <section id="script">
+        <h1>Script</h1>
+        <p>Đây là nơi chứa các đoạn mã script của bạn, bao gồm các đoạn mã thú vị để bạn tham khảo và thực hiện.</p>
+    </section>
+
+    <!-- Mục Executor -->
+    <section id="executor">
+        <h1>Executor</h1>
+        <p>Đây là công cụ thực thi mã của bạn. Bạn có thể sử dụng các đoạn mã đã nhập để kiểm tra và chạy chúng ngay tại đây.</p>
+    </section>
+
+    <!-- Mục Contact -->
+    <section id="contact">
+        <h1>Contact</h1>
+        <p>Liên hệ với chúng tôi qua email: example@email.com hoặc theo dõi chúng tôi trên các mạng xã hội để cập nhật thông tin mới nhất.</p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Trang Web Đẹp. All Rights Reserved.</p>
+    </footer>
+
+    <!-- JavaScript để tạo hiệu ứng khi cuộn -->
+    <script>
+        const sections = document.querySelectorAll('section');
+
+        window.addEventListener('scroll', checkSection);
+
+        function checkSection() {
+            const triggerBottom = window.innerHeight * 0.8;
+
+            sections.forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+
+                if (sectionTop < triggerBottom) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
