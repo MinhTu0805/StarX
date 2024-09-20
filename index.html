@@ -25,35 +25,19 @@
 
     <section id="scripts">
         <h2>Scripts</h2>
-        <div class="script-list">
-            <!-- Danh sách các script Lua sẽ nằm ở đây -->
-            <div class="script">
-                <h3>Script 1</h3>
-                <p>Details about Script 1...</p>
-                <button>Download</button>
-            </div>
-            <div class="script">
-                <h3>Script 2</h3>
-                <p>Details about Script 2...</p>
-                <button>Download</button>
-            </div>
+        <input type="text" id="searchScripts" placeholder="Search for scripts...">
+        <button onclick="searchScripts()">Search</button>
+        <div id="scriptList" class="script-list">
+            <!-- Script elements will be generated dynamically -->
         </div>
     </section>
 
     <section id="executors">
         <h2>Executors</h2>
-        <div class="executor-list">
-            <!-- Danh sách các executor -->
-            <div class="executor">
-                <h3>Executor 1</h3>
-                <p>Details about Executor 1...</p>
-                <button>Download</button>
-            </div>
-            <div class="executor">
-                <h3>Executor 2</h3>
-                <p>Details about Executor 2...</p>
-                <button>Download</button>
-            </div>
+        <input type="text" id="searchExecutors" placeholder="Search for executors...">
+        <button onclick="searchExecutors()">Search</button>
+        <div id="executorList" class="executor-list">
+            <!-- Executor elements will be generated dynamically -->
         </div>
     </section>
 
@@ -65,5 +49,7 @@
     <footer>
         <p>&copy; 2024 Roblox Script Hub</p>
     </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
