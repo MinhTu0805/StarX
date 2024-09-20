@@ -162,6 +162,20 @@
             background-color: #218838;
         }
 
+        /* Nút Discord */
+        .discord-button {
+            padding: 10px 15px;
+            background-color: #7289DA;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .discord-button:hover {
+            background-color: #5b6eae;
+        }
+
         /* Hiệu ứng chuyển động nhẹ khi cuộn */
         section {
             opacity: 0;
@@ -200,6 +214,7 @@
         <a href="#home">Home</a>
         <a href="#script">Script</a>
         <a href="#executor">Executor</a>
+        <a href="#discord">Discord</a>
         <a href="#contact">Contact</a>
     </nav>
 
@@ -212,7 +227,7 @@
     <!-- Mục Script -->
     <section id="script">
         <h1>Script</h1>
-        <p>Đây là nơi chứa các đoạn mã script của</p>
+        <p>Đây là nơi chứa các đoạn mã script của bạn, bao gồm các đoạn mã thú vị để bạn tham khảo và thực hiện.</p>
 
         <!-- Thanh tìm kiếm -->
         <div class="search-container">
@@ -233,7 +248,6 @@
                 <h3>Script 2: ...</h3>
                 <textarea class="script-box" id="scriptBox2" readonly>
 
-end
                 </textarea>
                 <button class="copy-button" onclick="copyScript('scriptBox2')">Copy Script</button>
             </div>
@@ -268,10 +282,17 @@ end
         </div>
     </section>
 
+    <!-- Mục Discord -->
+    <section id="discord">
+        <h1>Discord</h1>
+        <p>Tham gia cộng đồng của chúng tôi trên Discord để cập nhật thông tin mới nhất về script và Roblox!</p>
+        <button class="discord-button" onclick="window.location.href='https://discord.com/invite/jFydwZJ6'">Tham gia Discord</button>
+    </section>
+
     <!-- Mục Contact -->
     <section id="contact">
         <h1>Contact</h1>
-        <p>Liên hệ với chúng tôi qua email: lminhtu088@gmail.com</p>
+        <p>Liên hệ với chúng tôi qua email: example@email.com hoặc theo dõi chúng tôi trên các mạng xã hội để cập nhật thông tin mới nhất.</p>
     </section>
 
     <!-- Footer -->
