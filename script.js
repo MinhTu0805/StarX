@@ -1,4 +1,4 @@
-// Dữ liệu mẫu cho scripts và executors
+// Dữ liệu mẫu cho scripts và 
 const scripts = [
     { name: 'Auto Farm Script', description: 'Automatically farm resources in your favorite games.', downloadLink: '#' },
     { name: 'Speed Hack', description: 'Increase your movement speed drastically.', downloadLink: '#' },
@@ -79,8 +79,53 @@ function searchExecutors() {
     });
 }
 
-// Gọi hàm hiển thị khi trang được tải
+// Dữ liệu về các ngôn ngữ với cờ tương ứng
+const languages = [
+    { code: 'en', name: 'English', flag: 'https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg' },
+    { code: 'vi', name: 'Tiếng Việt', flag: 'https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg' },
+    { code: 'fr', name: 'Français', flag: 'https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg' },
+    // Thêm các ngôn ngữ khác...
+];
+
+// Thay đổi giao diện (sáng/tối/galaxy)
+function changeTheme(theme) {
+    document.body.classList.remove('light-mode', 'dark-mode');
+    if (theme === 'light') {
+        document.body.classList.add('light-mode');
+    } else if (theme === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+}
+
+// Thay đổi font chữ
+function changeFont(font) {
+    document.body.style.fontFamily = font;
+}
+
+// Tạo danh sách ngôn ngữ với cờ
+function displayLanguages() {
+    const languageContainer = document.getElementById('languageList');
+    languageContainer.innerHTML = '';
+    languages.forEach(lang => {
+        const langDiv = document.createElement('div');
+        langDiv.className = 'language-select';
+        langDiv.innerHTML = `
+            <img src="${lang.flag}" alt="${lang.name} Flag" width="30">
+            <span>${lang.name}</span>
+        `;
+        langDiv.addEventListener('click', () => setLanguage(lang.code));
+        languageContainer.appendChild(langDiv);
+    });
+}
+
+// Thay đổi ngôn ngữ
+function setLanguage(langCode) {
+    alert(`Language changed to: ${langCode}`); // Bạn có thể thay thế bằng hệ thống đa ngôn ngữ thực tế
+}
+
+// Gọi khi trang tải
 window.onload = function() {
+    displayLanguages();
     displayScripts();
     displayExecutors();
 }
