@@ -1,14 +1,22 @@
+/* Đặt font đẹp từ Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background: url('https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    overflow-x: hidden;
 }
 
+/* Thay đổi giao diện cho header và nav */
 header {
-    background-color: #333;
+    background: rgba(0, 0, 0, 0.8);
     padding: 10px 0;
     text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 nav ul {
@@ -18,59 +26,118 @@ nav ul {
 }
 
 nav ul li {
-    display: inline;
-    margin: 0 15px;
+    display: inline-block;
+    margin: 0 20px;
 }
 
 nav ul li a {
-    color: white;
+    color: #fff;
     text-decoration: none;
     font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: color 0.3s;
 }
 
+nav ul li a:hover {
+    color: #00d4ff;
+}
+
+/* Cấu trúc các phần chính */
 section {
-    padding: 20px;
-    margin: 10px auto;
+    padding: 60px 20px;
+    margin: 20px auto;
     width: 80%;
-    background-color: white;
+    background: rgba(0, 0, 0, 0.7);
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
 }
 
 h1, h2 {
-    text-align: center;
+    font-weight: 600;
+    color: #00d4ff;
+    letter-spacing: 1px;
 }
 
-.script-list, .executor-list {
-    display: flex;
-    justify-content: space-around;
+h3 {
+    font-size: 22px;
+    color: #fff;
 }
 
-.script, .executor {
-    background-color: #f9f9f9;
-    padding: 10px;
-    width: 30%;
-    border-radius: 5px;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+p {
+    font-size: 16px;
+    color: #ddd;
 }
 
+/* Thay đổi giao diện cho nút bấm */
 button {
-    background-color: #007bff;
-    color: white;
+    background-color: #00d4ff;
+    color: #fff;
     padding: 10px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 25px;
+    font-size: 16px;
     cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #007bff;
+    transform: scale(1.05);
 }
 
+input[type="text"] {
+    padding: 10px;
+    border-radius: 25px;
+    border: 2px solid #00d4ff;
+    width: 60%;
+    font-size: 16px;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    text-align: center;
+    outline: none;
+}
+
+input[type="text"]::placeholder {
+    color: #ccc;
+}
+
+input[type="text"]:focus {
+    border-color: #007bff;
+}
+
+/* Thay đổi giao diện danh sách script và executor */
+.script-list, .executor-list {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.script, .executor {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    width: 28%;
+    border-radius: 15px;
+    text-align: center;
+    margin: 20px 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s;
+}
+
+.script:hover, .executor:hover {
+    transform: translateY(-10px);
+}
+
+/* Chỉnh footer */
 footer {
     text-align: center;
     padding: 20px;
-    background-color: #333;
+    background-color: rgba(0, 0, 0, 0.9);
     color: white;
-}
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.5);
+    }
