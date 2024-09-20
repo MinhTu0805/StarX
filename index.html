@@ -201,12 +201,27 @@
             <button onclick="searchScript()">Tìm kiếm</button>
         </div>
 
-        <!-- Hộp textbox cho script -->
-        <textarea class="script-box" id="scriptBox" readonly>
+        <!-- Danh sách script -->
+        <div id="scriptList">
+            <div class="script-item">
+                <h3>Script 1: Hello Roblox</h3>
+                <textarea class="script-box" id="scriptBox1" readonly>
 -- Đây là một ví dụ script Roblox
 print("Hello, Roblox!")
-        </textarea>
-        <button class="copy-button" onclick="copyScript()">Copy Script</button>
+                </textarea>
+                <button class="copy-button" onclick="copyScript('scriptBox1')">Copy Script</button>
+            </div>
+            <div class="script-item">
+                <h3>Script 2: Chạy vòng lặp</h3>
+                <textarea class="script-box" id="scriptBox2" readonly>
+-- Script vòng lặp trong Roblox
+for i = 1, 10 do
+    print("Vòng lặp số: " .. i)
+end
+                </textarea>
+                <button class="copy-button" onclick="copyScript('scriptBox2')">Copy Script</button>
+            </div>
+        </div>
     </section>
 
     <!-- Mục Executor -->
@@ -218,7 +233,7 @@ print("Hello, Roblox!")
     <!-- Mục Contact -->
     <section id="contact">
         <h1>Contact</h1>
-        <p>Liên hệ với chúng tôi qua email: example@email.com hoặc theo dõi chúng tôi trên các mạng xã hội để cập nhật thông tin mới nhất.</p>
+        <p>Liên hệ với chúng tôi qua email: lminhtu088@gmail.com</p>
     </section>
 
     <!-- Footer -->
@@ -246,8 +261,8 @@ print("Hello, Roblox!")
             });
         }
 
-        function copyScript() {
-            const scriptBox = document.getElementById('scriptBox');
+        function copyScript(scriptId) {
+            const scriptBox = document.getElementById(scriptId);
             scriptBox.select();
             document.execCommand('copy');
             alert("Đã sao chép script!");
@@ -255,14 +270,16 @@ print("Hello, Roblox!")
 
         function searchScript() {
             const input = document.getElementById('searchInput').value.toLowerCase();
-            const scriptBox = document.getElementById('scriptBox');
-            const scriptContent = scriptBox.value.toLowerCase();
+            const scripts = document.querySelectorAll('.script-item');
 
-            if (scriptContent.includes(input)) {
-                alert("Tìm thấy script!");
-            } else {
-                alert("Không tìm thấy script nào!");
-            }
+            scripts.forEach(script => {
+                const title = script.querySelector('h3').textContent.toLowerCase();
+                if (title.includes(input)) {
+                    script.style.display = 'block';
+                } else {
+                    script.style.display = 'none';
+                }
+            });
         }
     </script>
 
