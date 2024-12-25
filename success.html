@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thành công</title>
+    <style>
+        /* Cấu hình chung cho body */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f0f8ff; /* Màu nền sáng dịu nhẹ */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+            text-align: center;
+            flex-direction: column;
+        }
+
+        /* Hiệu ứng box cho thông báo */
+        .success-message {
+            font-size: 28px;
+            font-weight: 700;
+            color: #4CAF50; /* Màu xanh lá cây tươi mát */
+            background-color: rgba(255, 255, 255, 0.8); /* Nền trắng trong suốt */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            max-width: 600px;
+            width: 100%;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        /* Hiệu ứng nhấp nháy cho thông báo khi load */
+        .success-message:hover {
+            transform: translateY(-10px);
+            opacity: 0.9;
+        }
+
+        /* Cải thiện giao diện của link */
+        .home-link {
+            font-size: 20px;
+            color: #fff;
+            background-color: #4CAF50; /* Màu xanh lá cây sáng */
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: 2px solid #4CAF50;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s, color 0.3s, transform 0.3s;
+        }
+
+        /* Hiệu ứng khi hover vào link */
+        .home-link:hover {
+            background-color: #fff;
+            color: #4CAF50;
+            transform: scale(1.1);
+        }
+
+        /* Thiết kế phần footer */
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.6); /* Màu chữ footer nhẹ nhàng */
+            letter-spacing: 1px;
+        }
+
+        .footer a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        /* Thêm hiệu ứng cho toàn bộ trang */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Áp dụng animation cho trang */
+        .success-message, .home-link {
+            animation: fadeIn 1s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-message">
+        ✅ Bạn đã xác minh thành công! Bạn không phải là robot.
+    </div>
+    <a class="home-link" href="index.html">Quay về trang chính</a>
+    <div class="footer">
+        © 2024 <a href="#">Captcha Xác Minh</a>. Tất cả các quyền được bảo lưu.
+    </div>
+</body>
+</html>

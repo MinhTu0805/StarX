@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captcha Xác Minh</title>
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #6DD5FA, #2980B9);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .captcha-container {
+            background: #ffffff;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 1s ease-out;
+            transform: scale(1);
+            transition: transform 0.3s ease;
+        }
+
+        .captcha-container:hover {
+            transform: scale(1.05);
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #3498db;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        canvas {
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background-color: #f7f7f7;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: box-shadow 0.3s ease;
+        }
+
+        canvas:hover {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            font-size: 16px;
+            color: #333;
+            background: #f7f7f7;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #2980B9;
+            outline: none;
+            box-shadow: 0 0 8px rgba(41, 128, 185, 0.5);
+            background-color: #e3f2fd;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px 20px;
+            background: #2980B9;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background: #1c6f97;
+            transform: scale(1.05);
+        }
+
+        .error {
+            color: #f44336;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .loading {
+            font-size: 18px;
+            color: #3498db;
+            font-weight: 600;
+        }
+
+        .instructions {
+            margin-top: 30px;
+            text-align: left;
+            font-size: 14px;
+            background: #f7f7f7;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .instructions h3 {
+            font-size: 18px;
+            color: #3498db;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding-left: 15px;
+        }
+
+        .instructions li {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .instructions li:before {
+            content: "✔";
+            color: #3498db;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+
+        footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Animation fadeIn */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="captcha-container">
+        <h2>Xác Minh bạn là con người</h2>
+        <canvas id="captcha" width="300" height="120"></canvas>
+        <input type="text" id="captcha-input" placeholder="Nhập mã Captcha">
+        <button onclick="verifyCaptcha()">Xác Minh</button>
+        <p id="error-message" class="error"></p>
+        <p id="loading-message" class="loading" style="display: none;">Đang xác minh, vui lòng chờ...</p>
+
+        <div class="instructions">
+            <h3>Hướng Dẫn Nhập:</h3>
+            <ul>
+                <li>Nhập các ký tự từ <strong>trái sang phải</strong>.</li>
+                <li>Nhập các ký tự từ <strong>trên xuống dưới</strong> nếu chúng cùng cột.</li>
+                <li>Chỉ nhập các ký tự rõ ràng trong hình.</li>
+            </ul>
+        </div>
+
+        <footer>&copy; 2024 <a href="#">Captcha Xác Minh</a>. Tất cả các quyền được bảo lưu.</footer>
+    </div>
+
+    <script>
+        let captchaText = "";
+
+        // Hàm tạo mã Captcha ngẫu nhiên
+        function generateCaptcha() {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            let captcha = "";
+            for (let i = 0; i < 6; i++) {
+                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return captcha;
+        }
+
+        // Hàm vẽ Captcha
+        function drawCaptcha() {
+            const canvas = document.getElementById('captcha');
+            const ctx = canvas.getContext('2d');
+
+            // Xóa nội dung canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Vẽ nền
+            ctx.fillStyle = "#f7f7f7";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Tạo danh sách ký tự và tọa độ
+            let captchaChars = [];
+            captchaText = generateCaptcha();
+
+            for (let i = 0; i < captchaText.length; i++) {
+                const x = Math.random() * (canvas.width - 40) + 10; // Vị trí x
+                const y = Math.random() * (canvas.height - 40) + 40; // Vị trí y
+                const angle = (Math.random() * 30 - 15) * (Math.PI / 180); // Góc nghiêng (-15 đến 15 độ)
+
+                // Lưu ký tự và tọa độ
+                captchaChars.push({ char: captchaText[i], x, y });
+
+                // Vẽ ký tự
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(angle);
+                ctx.font = "30px Arial";
+                ctx.fillStyle = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 1)`;
+                ctx.fillText(captchaText[i], 0, 0);
+                ctx.restore();
+            }
+
+            // Sắp xếp ký tự theo quy tắc:
+            captchaChars.sort((a, b) => a.x - b.x || a.y - b.y);
+
+            // Tạo chuỗi Captcha đúng thứ tự hiển thị
+            captchaText = captchaChars.map(item => item.char).join('');
+
+            // Thêm các đường gạch ngang
+            for (let i = 0; i < 5; i++) {
+                const x1 = Math.random() * canvas.width;
+                const y1 = Math.random() * canvas.height;
+                const x2 = Math.random() * canvas.width;
+                const y2 = Math.random() * canvas.height;
+
+                ctx.strokeStyle = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 0.7)`;
+                ctx.lineWidth = Math.random() * 2 + 1;
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+            }
+        }
+
+        // Hàm xác minh Captcha
+        function verifyCaptcha() {
+            const input = document.getElementById('captcha-input').value;
+            const errorMessage = document.getElementById('error-message');
+            const loadingMessage = document.getElementById('loading-message');
+
+            // Hiện thông báo loading
+            loadingMessage.style.display = "block";
+
+            // 5 giây sau, kiểm tra captcha
+            setTimeout(function() {
+                if (input === captchaText) {
+                    // Nếu đúng, chuyển đến success.html
+                    window.location.href = "success.html";
+                } else {
+                    // Nếu sai, hiển thị thông báo lỗi
+                    errorMessage.textContent = "Captcha không chính xác, vui lòng thử lại.";
+                    loadingMessage.style.display = "none"; // Ẩn thông báo loading
+                    drawCaptcha(); // Tạo captcha mới
+                    document.getElementById('captcha-input').value = ""; // Xóa input
+                }
+            }, 5000); // Chờ 5 giây trước khi kiểm tra
+        }
+
+        // Gọi hàm vẽ Captcha khi trang được tải
+        drawCaptcha();
+    </script>
+</body>
+</html>
