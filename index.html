@@ -200,7 +200,6 @@
     <script>
         let captchaText = "";
 
-        // Hàm tạo mã Captcha ngẫu nhiên
         function generateCaptcha() {
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             let captcha = "";
@@ -210,31 +209,25 @@
             return captcha;
         }
 
-        // Hàm vẽ Captcha
         function drawCaptcha() {
             const canvas = document.getElementById('captcha');
             const ctx = canvas.getContext('2d');
 
-            // Xóa nội dung canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Vẽ nền
             ctx.fillStyle = "#f7f7f7";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Tạo danh sách ký tự và tọa độ
             let captchaChars = [];
             captchaText = generateCaptcha();
 
             for (let i = 0; i < captchaText.length; i++) {
-                const x = Math.random() * (canvas.width - 40) + 10; // Vị trí x
-                const y = Math.random() * (canvas.height - 40) + 40; // Vị trí y
-                const angle = (Math.random() * 30 - 15) * (Math.PI / 180); // Góc nghiêng (-15 đến 15 độ)
+                const x = Math.random() * (canvas.width - 40) + 10;
+                const y = Math.random() * (canvas.height - 40) + 40;
+                const angle = (Math.random() * 30 - 15) * (Math.PI / 180);
 
-                // Lưu ký tự và tọa độ
                 captchaChars.push({ char: captchaText[i], x, y });
 
-                // Vẽ ký tự
                 ctx.save();
                 ctx.translate(x, y);
                 ctx.rotate(angle);
@@ -244,13 +237,9 @@
                 ctx.restore();
             }
 
-            // Sắp xếp ký tự theo quy tắc:
             captchaChars.sort((a, b) => a.x - b.x || a.y - b.y);
-
-            // Tạo chuỗi Captcha đúng thứ tự hiển thị
             captchaText = captchaChars.map(item => item.char).join('');
 
-            // Thêm các đường gạch ngang
             for (let i = 0; i < 5; i++) {
                 const x1 = Math.random() * canvas.width;
                 const y1 = Math.random() * canvas.height;
@@ -264,33 +253,45 @@
                 ctx.lineTo(x2, y2);
                 ctx.stroke();
             }
+
+            for (let i = 0; i < 3; i++) {
+                const startX = Math.random() * canvas.width;
+                const startY = Math.random() * canvas.height;
+                const cp1X = Math.random() * canvas.width;
+                const cp1Y = Math.random() * canvas.height;
+                const cp2X = Math.random() * canvas.width;
+                const cp2Y = Math.random() * canvas.height;
+                const endX = Math.random() * canvas.width;
+                const endY = Math.random() * canvas.height;
+
+                ctx.strokeStyle = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 0.7)`;
+                ctx.lineWidth = Math.random() * 2 + 1;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, endX, endY);
+                ctx.stroke();
+            }
         }
 
-        // Hàm xác minh Captcha
         function verifyCaptcha() {
             const input = document.getElementById('captcha-input').value;
             const errorMessage = document.getElementById('error-message');
             const loadingMessage = document.getElementById('loading-message');
 
-            // Hiện thông báo loading
             loadingMessage.style.display = "block";
 
-            // 5 giây sau, kiểm tra captcha
-            setTimeout(function() {
+            setTimeout(function () {
                 if (input === captchaText) {
-                    // Nếu đúng, chuyển đến success.html
                     window.location.href = "success.html";
                 } else {
-                    // Nếu sai, hiển thị thông báo lỗi
                     errorMessage.textContent = "Captcha không chính xác, vui lòng thử lại.";
-                    loadingMessage.style.display = "none"; // Ẩn thông báo loading
-                    drawCaptcha(); // Tạo captcha mới
-                    document.getElementById('captcha-input').value = ""; // Xóa input
+                    loadingMessage.style.display = "none";
+                    drawCaptcha();
+                    document.getElementById('captcha-input').value = "";
                 }
-            }, 5000); // Chờ 5 giây trước khi kiểm tra
+            }, 5000);
         }
 
-        // Gọi hàm vẽ Captcha khi trang được tải
         drawCaptcha();
     </script>
 </body>
