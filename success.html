@@ -5,24 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thành công</title>
     <style>
-        /* Cấu hình chung cho body */
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: #f0f8ff; /* Màu nền sáng dịu nhẹ */
+        /* Reset CSS */
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #80deea, #26c6da);
+            color: #333;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            color: #333;
-            text-align: center;
-            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
         }
 
-        /* Hiệu ứng box cho thông báo */
-        .success-message {
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            z-index: 1;
+        }
+
+        .success-container {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 1s ease-out;
+            transform: scale(1);
+            transition: transform 0.3s ease;
+            z-index: 2;
+            backdrop-filter: blur(10px);
+        }
+
+        .success-container:hover {
+            transform: scale(1.05);
+        }
+
+        h2 {
             font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #00796b;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .success-message {
+            font-size: 24px;
             font-weight: 700;
             color: #4CAF50; /* Màu xanh lá cây tươi mát */
             background-color: rgba(255, 255, 255, 0.8); /* Nền trắng trong suốt */
@@ -35,13 +74,11 @@
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        /* Hiệu ứng nhấp nháy cho thông báo khi load */
         .success-message:hover {
             transform: translateY(-10px);
             opacity: 0.9;
         }
 
-        /* Cải thiện giao diện của link */
         .home-link {
             font-size: 20px;
             color: #fff;
@@ -55,52 +92,52 @@
             transition: background-color 0.3s, color 0.3s, transform 0.3s;
         }
 
-        /* Hiệu ứng khi hover vào link */
         .home-link:hover {
             background-color: #fff;
             color: #4CAF50;
             transform: scale(1.1);
         }
 
-        /* Thiết kế phần footer */
-        .footer {
-            position: absolute;
-            bottom: 20px;
-            font-size: 14px;
-            color: rgba(0, 0, 0, 0.6); /* Màu chữ footer nhẹ nhàng */
-            letter-spacing: 1px;
+        footer {
+            margin-top: 40px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
         }
 
-        .footer a {
-            color: #4CAF50;
+        footer a {
+            color: #00796b;
             text-decoration: none;
         }
 
-        /* Thêm hiệu ứng cho toàn bộ trang */
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Animation fadeIn */
         @keyframes fadeIn {
-            from {
+            0% {
                 opacity: 0;
                 transform: translateY(20px);
             }
-            to {
+            100% {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-
-        /* Áp dụng animation cho trang */
-        .success-message, .home-link {
-            animation: fadeIn 1s ease-out forwards;
-        }
     </style>
 </head>
 <body>
-    <div class="success-message">
-        ✅ Bạn đã xác minh thành công! Bạn không phải là robot.
-    </div>
-    <a class="home-link" href="index.html">Quay về trang chính</a>
-    <div class="footer">
-        © 2024 <a href="#">Captcha Xác Minh</a>. Tất cả các quyền được bảo lưu.
+    <div class="stars"></div>
+    <div class="success-container">
+        <h2>Thành công</h2>
+        <div class="success-message">
+            ✅ Bạn đã xác minh thành công! Bạn không phải là robot.
+        </div>
+        <a class="home-link" href="index.html">Quay về trang chính</a>
+        <footer>
+            © 2024 <a href="#">Captcha Xác Minh</a>. Tất cả các quyền được bảo lưu.
+        </footer>
     </div>
 </body>
 </html>
