@@ -198,80 +198,101 @@
     </div>
 
     <script>
-        let captchaText = "";
+    let captchaText = "";
+    let countdown = 180; // 3 phút (180 giây)
+    let timerInterval;
 
-        function generateCaptcha() {
-            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            let captcha = "";
-            for (let i = 0; i < 6; i++) {
-                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return captcha;
+    function generateCaptcha() {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let captcha = "";
+        for (let i = 0; i < 6; i++) {
+            captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return captcha;
+    }
+
+    function drawCaptcha() {
+        const canvas = document.getElementById('captcha');
+        const ctx = canvas.getContext('2d');
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "#f7f7f7";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        let captchaChars = [];
+        captchaText = generateCaptcha();
+
+        for (let i = 0; i < captchaText.length; i++) {
+            const x = Math.random() * (canvas.width - 40) + 10;
+            const y = Math.random() * (canvas.height - 40) + 40;
+            const angle = (Math.random() * 30 - 15) * (Math.PI / 180);
+
+            captchaChars.push({ char: captchaText[i], x, y });
+
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.font = "30px Arial";
+            ctx.fillStyle = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 1)`;
+            ctx.fillText(captchaText[i], 0, 0);
+            ctx.restore();
         }
 
-        function drawCaptcha() {
-            const canvas = document.getElementById('captcha');
-            const ctx = canvas.getContext('2d');
+        captchaChars.sort((a, b) => a.x - b.x || a.y - b.y);
+        captchaText = captchaChars.map(item => item.char).join('');
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < 5; i++) {
+            const x1 = Math.random() * canvas.width;
+            const y1 = Math.random() * canvas.height;
+            const x2 = Math.random() * canvas.width;
+            const y2 = Math.random() * canvas.height;
 
-            ctx.fillStyle = "#f7f7f7";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            let captchaChars = [];
-            captchaText = generateCaptcha();
-
-            for (let i = 0; i < captchaText.length; i++) {
-                const x = Math.random() * (canvas.width - 40) + 10;
-                const y = Math.random() * (canvas.height - 40) + 40;
-                const angle = (Math.random() * 30 - 15) * (Math.PI / 180);
-
-                captchaChars.push({ char: captchaText[i], x, y });
-
-                ctx.save();
-                ctx.translate(x, y);
-                ctx.rotate(angle);
-                ctx.font = "30px Arial";
-                ctx.fillStyle = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 1)`;
-                ctx.fillText(captchaText[i], 0, 0);
-                ctx.restore();
-            }
-
-            captchaChars.sort((a, b) => a.x - b.x || a.y - b.y);
-            captchaText = captchaChars.map(item => item.char).join('');
-
-            for (let i = 0; i < 5; i++) {
-                const x1 = Math.random() * canvas.width;
-                const y1 = Math.random() * canvas.height;
-                const x2 = Math.random() * canvas.width;
-                const y2 = Math.random() * canvas.height;
-
-                ctx.strokeStyle = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 0.7)`;
-                ctx.lineWidth = Math.random() * 2 + 1;
-                ctx.beginPath();
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.stroke();
-            }
-
-            for (let i = 0; i < 3; i++) {
-                const startX = Math.random() * canvas.width;
-                const startY = Math.random() * canvas.height;
-                const cp1X = Math.random() * canvas.width;
-                const cp1Y = Math.random() * canvas.height;
-                const cp2X = Math.random() * canvas.width;
-                const cp2Y = Math.random() * canvas.height;
-                const endX = Math.random() * canvas.width;
-                const endY = Math.random() * canvas.height;
-
-                ctx.strokeStyle = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 0.7)`;
-                ctx.lineWidth = Math.random() * 2 + 1;
-                ctx.beginPath();
-                ctx.moveTo(startX, startY);
-                ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, endX, endY);
-                ctx.stroke();
-            }
+            ctx.strokeStyle = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 0.7)`;
+            ctx.lineWidth = Math.random() * 2 + 1;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
         }
+
+        for (let i = 0; i < 3; i++) {
+            const startX = Math.random() * canvas.width;
+            const startY = Math.random() * canvas.height;
+            const cp1X = Math.random() * canvas.width;
+            const cp1Y = Math.random() * canvas.height;
+            const cp2X = Math.random() * canvas.width;
+            const cp2Y = Math.random() * canvas.height;
+            const endX = Math.random() * canvas.width;
+            const endY = Math.random() * canvas.height;
+
+            ctx.strokeStyle = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 0.7)`;
+            ctx.lineWidth = Math.random() * 2 + 1;
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, endX, endY);
+            ctx.stroke();
+        }
+    }
+
+    function startCountdown() {
+        const errorMessage = document.getElementById('error-message');
+        errorMessage.textContent = `Thời gian còn lại: 3:00`;
+        countdown = 180;
+
+        timerInterval = setInterval(() => {
+            countdown--;
+            const minutes = Math.floor(countdown / 60);
+            const seconds = countdown % 60;
+            errorMessage.textContent = `Thời gian còn lại: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+            if (countdown <= 0) {
+                clearInterval(timerInterval);
+                drawCaptcha(); // Làm mới captcha
+                startCountdown(); // Bắt đầu lại đếm ngược
+            }
+        }, 1000);
+    }
 
         function verifyCaptcha() {
             const input = document.getElementById('captcha-input').value;
@@ -292,7 +313,9 @@
             }, 5000);
         }
 
+        // Khởi động
         drawCaptcha();
+        startCountdown();
     </script>
 </body>
 </html>
