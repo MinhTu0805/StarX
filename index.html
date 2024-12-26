@@ -14,8 +14,8 @@
 
         body {
             font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #6DD5FA, #2980B9);
-            color: #333;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -25,10 +25,10 @@
         }
 
         .captcha-container {
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
             padding: 50px;
             border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
             max-width: 450px;
             width: 100%;
             text-align: center;
@@ -45,45 +45,45 @@
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 20px;
-            color: #3498db;
-            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+            color: #00d2ff;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
         }
 
         canvas {
             border-radius: 10px;
             margin-bottom: 20px;
-            background-color: #f7f7f7;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
             transition: box-shadow 0.3s ease;
         }
 
         canvas:hover {
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
         }
 
         input {
             width: 100%;
             padding: 15px 20px;
             margin-bottom: 25px;
-            border: 2px solid #3498db;
+            border: 2px solid #00d2ff;
             border-radius: 10px;
             font-size: 16px;
-            color: #333;
-            background: #f7f7f7;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
         }
 
         input:focus {
-            border-color: #2980B9;
+            border-color: #00d2ff;
             outline: none;
-            box-shadow: 0 0 8px rgba(41, 128, 185, 0.5);
-            background-color: #e3f2fd;
+            box-shadow: 0 0 8px rgba(0, 210, 255, 0.5);
+            background-color: rgba(0, 210, 255, 0.1);
         }
 
         button {
             width: 100%;
             padding: 15px 20px;
-            background: #2980B9;
+            background: #00d2ff;
             color: #fff;
             border: none;
             border-radius: 10px;
@@ -94,7 +94,7 @@
         }
 
         button:hover {
-            background: #1c6f97;
+            background: #00a1d2;
             transform: scale(1.05);
         }
 
@@ -107,7 +107,7 @@
 
         .loading {
             font-size: 18px;
-            color: #3498db;
+            color: #00d2ff;
             font-weight: 600;
         }
 
@@ -115,15 +115,15 @@
             margin-top: 30px;
             text-align: left;
             font-size: 14px;
-            background: #f7f7f7;
+            background: rgba(255, 255, 255, 0.1);
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
 
         .instructions h3 {
             font-size: 18px;
-            color: #3498db;
+            color: #00d2ff;
             margin-bottom: 12px;
             font-weight: 600;
         }
@@ -141,7 +141,7 @@
 
         .instructions li:before {
             content: "✔";
-            color: #3498db;
+            color: #00d2ff;
             margin-right: 10px;
             font-size: 16px;
         }
@@ -149,12 +149,12 @@
         footer {
             margin-top: 40px;
             font-size: 12px;
-            color: #777;
+            color: #aaa;
             text-align: center;
         }
 
         footer a {
-            color: #3498db;
+            color: #00d2ff;
             text-decoration: none;
         }
 
@@ -173,7 +173,6 @@
                 transform: translateY(0);
             }
         }
-
     </style>
 </head>
 <body>
@@ -217,7 +216,7 @@
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = "#f7f7f7";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         let captchaChars = [];
