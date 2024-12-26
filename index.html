@@ -305,11 +305,16 @@
     }
 
     function startCountdown() {
-        const countdownBar = document.getElementById('countdown-bar');
-        countdownBar.style.animation = `countdown ${countdown}s linear forwards`;
+        const errorMessage = document.getElementById('error-message');
+        errorMessage.textContent = `Thời gian còn lại: 3:00`;
+        countdown = 180;
 
         timerInterval = setInterval(() => {
             countdown--;
+            const minutes = Math.floor(countdown / 60);
+            const seconds = countdown % 60;
+            errorMessage.textContent = `Thời gian còn lại: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
             if (countdown <= 0) {
                 clearInterval(timerInterval);
                 drawCaptcha(); // Làm mới captcha
