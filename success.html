@@ -63,7 +63,7 @@
         .success-message {
             font-size: 24px;
             font-weight: 700;
-            color: #4CAF50; /* Màu xanh lá cây tươi mát */
+            color: #333; /* Màu chữ phù hợp với nền */
             background-color: rgba(255, 255, 255, 0.8); /* Nền trắng trong suốt */
             padding: 30px;
             border-radius: 12px;
@@ -123,6 +123,21 @@
             100% {
                 opacity: 1;
                 transform: translateY(0);
+            }
+        }
+
+        /* Media query for mobile devices */
+        @media (max-width: 600px) {
+            .home-link {
+                padding: 10px 20px; /* Điều chỉnh kích thước nút bấm cho màn hình nhỏ */
+            }
+
+            .success-message {
+                font-size: 20px; /* Điều chỉnh kích thước chữ cho màn hình nhỏ */
+            }
+
+            h2 {
+                font-size: 24px; /* Điều chỉnh kích thước tiêu đề cho màn hình nhỏ */
             }
         }
     </style>
