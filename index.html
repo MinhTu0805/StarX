@@ -342,9 +342,64 @@
         }, 5000);
     }
 
+    // Kiểm tra chế độ ẩn danh
+    function detectIncognitoMode() {
+        return new Promise(function (resolve, reject) {
+            var fs = window.RequestFileSystem || window.webkitRequestFileSystem;
+            if (!fs) {
+                resolve(false);
+            } else {
+                fs(window.TEMPORARY, 100, function () {
+                    resolve(false);
+                }, function () {
+                    resolve(true);
+                });
+            }
+        });
+    }
+
+    // Kiểm tra IP Proxy hoặc VPN bằng dịch vụ của bên thứ ba
+    function checkProxyOrVPN() {
+        return fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                const userIP = data.ip;
+                // Sử dụng dịch vụ của bên thứ ba để kiểm tra IP (ví dụ: ipqualityscore.com)
+                return fetch(`https://proxycheck.io/v2/${userIP}?key=YOUR_API_KEY`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data[userIP].proxy === "yes") {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    });
+            });
+    }
+
+    // Kiểm tra và hiển thị thông báo
+    async function checkBrowser() {
+        const incognito = await detectIncognitoMode();
+        const proxyOrVPN = await checkProxyOrVPN();
+
+        const errorMessage = document.getElementById('error-message');
+
+        if (incognito) {
+            errorMessage.textContent = 'Chế độ ẩn danh bị cấm. Bạn sẽ bị ban vĩnh viễn!';
+            // Thực hiện hành động cấm ở đây (ví dụ: chuyển hướng)
+            window.location.href = "banned.html";
+        } else if (proxyOrVPN) {
+            errorMessage.textContent = 'Proxy hoặc VPN bị cấm. Bạn sẽ bị ban vĩnh viễn!';
+            // Thực hiện hành động cấm ở đây (ví dụ: chuyển hướng)
+            window.location.href = "banned.html";
+        } else {
+            drawCaptcha();
+            startCountdown();
+        }
+    }
+
     // Khởi động
-    drawCaptcha();
-    startCountdown();
+    checkBrowser();
     </script>
 </body>
 </html>
