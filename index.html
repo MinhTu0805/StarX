@@ -1,405 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Captcha Xác Minh</title>
-    <style>
-        /* Reset CSS */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #e0f7fa, #80deea, #26c6da);
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            padding: 20px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .stars {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/stardust.png');
-            z-index: 1;
-        }
-
-        .captcha-container {
-            background: rgba(255, 255, 255, 0.8);
-            padding: 50px;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-            max-width: 450px;
-            width: 100%;
-            text-align: center;
-            animation: fadeIn 1s ease-out;
-            transform: scale(1);
-            transition: transform 0.3s ease;
-            z-index: 2;
-            backdrop-filter: blur(10px);
-        }
-
-        .captcha-container:hover {
-            transform: scale(1.05);
-        }
-
-        h2 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #00796b;
-            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        canvas {
-            border-radius: 10px;
-            margin-bottom: 20px;
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: box-shadow 0.3s ease;
-        }
-
-        canvas:hover {
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        input {
-            width: 100%;
-            padding: 15px 20px;
-            margin-bottom: 25px;
-            border: 2px solid #00796b;
-            border-radius: 10px;
-            font-size: 16px;
-            color: #333;
-            background: rgba(255, 255, 255, 0.7);
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            border-color: #00796b;
-            outline: none;
-            box-shadow: 0 0 8px rgba(0, 121, 107, 0.5);
-            background-color: rgba(224, 247, 250, 0.7);
-        }
-
-        button {
-            width: 100%;
-            padding: 15px 20px;
-            background: #00796b;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s ease, transform 0.3s ease;
-        }
-
-        button:hover {
-            background: #004d40;
-            transform: scale(1.05);
-        }
-
-        .error {
-            color: #f44336;
-            margin-top: 10px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .loading {
-            font-size: 18px;
-            color: #00796b;
-            font-weight: 600;
-        }
-
-        .instructions {
-            margin-top: 30px;
-            text-align: left;
-            font-size: 14px;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .instructions h3 {
-            font-size: 18px;
-            color: #00796b;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-
-        .instructions ul {
-            list-style: none;
-            padding-left: 15px;
-        }
-
-        .instructions li {
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-        }
-
-        .instructions li:before {
-            content: "✔";
-            color: #00796b;
-            margin-right: 10px;
-            font-size: 16px;
-        }
-
-        footer {
-            margin-top: 40px;
-            font-size: 12px;
-            color: #777;
-            text-align: center;
-        }
-
-        footer a {
-            color: #00796b;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Animation fadeIn */
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Countdown Timer Animation */
-        @keyframes countdown {
-            0% {
-                width: 100%;
-            }
-            100% {
-                width: 0%;
-            }
-        }
-
-        .countdown-bar {
-            height: 5px;
-            background: #00796b;
-            animation: countdown 180s linear forwards;
-            margin-top: -10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mint HUB</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="stars"></div>
-    <div class="captcha-container">
-        <h2>Xác Minh bạn là con người</h2>
-        <canvas id="captcha" width="300" height="120"></canvas>
-        <input type="text" id="captcha-input" placeholder="Nhập mã Captcha">
-        <button onclick="verifyCaptcha()">Xác Minh</button>
-        <div class="countdown-bar" id="countdown-bar"></div>
-        <p id="error-message" class="error"></p>
-        <p id="loading-message" class="loading" style="display: none;">Đang xác minh, vui lòng chờ...</p>
-
-        <div class="instructions">
-            <h3>Hướng Dẫn Nhập:</h3>
-            <ul>
-                <li>Nhập các ký tự từ <strong>trái sang phải</strong>.</li>
-                <li>Nhập các ký tự từ <strong>trên xuống dưới</strong> nếu chúng cùng cột.</li>
-                <li>Chỉ nhập các ký tự rõ ràng trong hình.</li>
+  <header class="navbar">
+    <div class="container">
+      <div class="logo">
+        <a href="#">Mint Hub</a>
+      </div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#">Home</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle">Script</a>
+            <ul class="dropdown-menu">
+              <li><a href="#">Option 1</a></li>
+              <li><a href="#">Option 2</a></li>
+              <li><a href="#">Option 3</a></li>
             </ul>
-        </div>
-
-        <footer>&copy; 2024 <a href="#">Captcha Xác Minh</a>. Tất cả các quyền được bảo lưu.</footer>
+          </li>
+          <li><a href="#">Executor</a></li>
+          <li><a href="#">Discord</a></li>
+        </ul>
+      </nav>
+      <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
     </div>
-
-    <script>
-    let captchaText = "";
-    let countdown = 180; // 3 phút (180 giây)
-    let timerInterval;
-
-    function generateCaptcha() {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let captcha = "";
-        for (let i = 0; i < 6; i++) {
-            captcha += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return captcha;
-    }
-
-    function drawCaptcha() {
-        const canvas = document.getElementById('captcha');
-        const ctx = canvas.getContext('2d');
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        let captchaChars = [];
-        captchaText = generateCaptcha();
-
-        for (let i = 0; i < captchaText.length; i++) {
-            const x = Math.random() * (canvas.width - 40) + 10;
-            const y = Math.random() * (canvas.height - 40) + 40;
-            const angle = (Math.random() * 30 - 15) * (Math.PI / 180);
-
-            captchaChars.push({ char: captchaText[i], x, y });
-
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(angle);
-            ctx.font = "30px Arial";
-            ctx.fillStyle = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 1)`;
-            ctx.fillText(captchaText[i], 0, 0);
-            ctx.restore();
-        }
-
-        captchaChars.sort((a, b) => a.x - b.x || a.y - b.y);
-        captchaText = captchaChars.map(item => item.char).join('');
-
-        for (let i = 0; i < 5; i++) {
-            const x1 = Math.random() * canvas.width;
-            const y1 = Math.random() * canvas.height;
-            const x2 = Math.random() * canvas.width;
-            const y2 = Math.random() * canvas.height;
-
-            ctx.strokeStyle = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 0.7)`;
-            ctx.lineWidth = Math.random() * 2 + 1;
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.stroke();
-        }
-
-        for (let i = 0; i < 3; i++) {
-            const startX = Math.random() * canvas.width;
-            const startY = Math.random() * canvas.height;
-            const cp1X = Math.random() * canvas.width;
-            const cp1Y = Math.random() * canvas.height;
-            const cp2X = Math.random() * canvas.width;
-            const cp2Y = Math.random() * canvas.height;
-            const endX = Math.random() * canvas.width;
-            const endY = Math.random() * canvas.height;
-
-            ctx.strokeStyle = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 0.7)`;
-            ctx.lineWidth = Math.random() * 2 + 1;
-            ctx.beginPath();
-            ctx.moveTo(startX, startY);
-            ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, endX, endY);
-            ctx.stroke();
-        }
-    }
-
-    function startCountdown() {
-        const errorMessage = document.getElementById('error-message');
-        errorMessage.textContent = `Thời gian còn lại: 3:00`;
-        countdown = 180;
-
-        timerInterval = setInterval(() => {
-            countdown--;
-            const minutes = Math.floor(countdown / 60);
-            const seconds = countdown % 60;
-            errorMessage.textContent = `Thời gian còn lại: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-
-            if (countdown <= 0) {
-                clearInterval(timerInterval);
-                drawCaptcha(); // Làm mới captcha
-                startCountdown(); // Bắt đầu lại đếm ngược
-            }
-        }, 1000);
-    }
-
-    function verifyCaptcha() {
-        const input = document.getElementById('captcha-input').value;
-        const errorMessage = document.getElementById('error-message');
-        const loadingMessage = document.getElementById('loading-message');
-
-        loadingMessage.style.display = "block";
-
-        setTimeout(function () {
-            if (input === captchaText) {
-                window.location.href = "success.html";
-            } else {
-                errorMessage.textContent = "Captcha không chính xác, vui lòng thử lại.";
-                loadingMessage.style.display = "none";
-                drawCaptcha();
-                document.getElementById('captcha-input').value = "";
-            }
-        }, 5000);
-    }
-
-    // Kiểm tra chế độ ẩn danh
-    function detectIncognitoMode() {
-        return new Promise(function (resolve, reject) {
-            var fs = window.RequestFileSystem || window.webkitRequestFileSystem;
-            if (!fs) {
-                resolve(false);
-            } else {
-                fs(window.TEMPORARY, 100, function () {
-                    resolve(false);
-                }, function () {
-                    resolve(true);
-                });
-            }
-        });
-    }
-
-    // Kiểm tra IP Proxy hoặc VPN bằng dịch vụ của bên thứ ba
-    function checkProxyOrVPN() {
-        return fetch('https://api.ipify.org?format=json')
-            .then(response => response.json())
-            .then(data => {
-                const userIP = data.ip;
-                // Sử dụng dịch vụ của bên thứ ba để kiểm tra IP (ví dụ: ipqualityscore.com)
-                return fetch(`https://proxycheck.io/v2/${userIP}?key=YOUR_API_KEY`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data[userIP].proxy === "yes") {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    });
-            });
-    }
-
-    // Kiểm tra và hiển thị thông báo
-    async function checkBrowser() {
-        const incognito = await detectIncognitoMode();
-        const proxyOrVPN = await checkProxyOrVPN();
-
-        const errorMessage = document.getElementById('error-message');
-
-        if (incognito) {
-            errorMessage.textContent = 'Chế độ ẩn danh bị cấm. Bạn sẽ bị ban vĩnh viễn!';
-            // Thực hiện hành động cấm ở đây (ví dụ: chuyển hướng)
-            window.location.href = "banned.html";
-        } else if (proxyOrVPN) {
-            errorMessage.textContent = 'Proxy hoặc VPN bị cấm. Bạn sẽ bị ban vĩnh viễn!';
-            // Thực hiện hành động cấm ở đây (ví dụ: chuyển hướng)
-            window.location.href = "banned.html";
-        } else {
-            drawCaptcha();
-            startCountdown();
-        }
-    }
-
-    // Khởi động
-    checkBrowser();
-    </script>
+  </header>
+  <main>
+    <section class="intro">
+    <div class="intro-content">
+      <h1>Enhanced Performance</h1>
+      <p>Hello, this is a website that shares the best roblox executors and scripts .</p>
+    </div>
+    <div class="animated-background">
+      <div class="shape"></div>
+      <div class="shape"></div>
+      <div class="shape"></div>
+    </div>
+  </section>
+  </main>
+  <script src="script.js"></script>
 </body>
 </html>
