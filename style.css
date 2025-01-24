@@ -18,6 +18,9 @@ body, html {
   width: 90%;
   max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .navbar {
@@ -94,7 +97,7 @@ body, html {
 }
 
 .hamburger {
-  display: none;
+  display: flex;
   flex-direction: column;
   cursor: pointer;
 }
@@ -217,4 +220,4 @@ body, html {
     text-align: center;
     padding: 10px 0;
   }
-}
+  }
