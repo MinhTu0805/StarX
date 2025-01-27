@@ -1,54 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mint HUB</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Responsive Navbar with Animated Background</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 </head>
 <body>
-  <header class="navbar">
-    <div class="container">
-      <div class="logo">
-        <a href="#">Mint Hub</a>
-      </div>
-      <div class="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-      <nav>
-        <ul class="nav-links">
-          <li><a href="#">Home</a></li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle">Script</a>
-            <ul class="dropdown-menu">
-              <li><a href="#">Option 1</a></li>
-              <li><a href="#">Option 2</a></li>
-              <li><a href="#">Option 3</a></li>
-            </ul>
-          </li>
-          <li><a href="#">Executor</a></li>
-          <li><a href="#">Discord</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-  <main>
-    <section class="intro">
-      <div class="intro-content">
-        <h1>Enhanced Performance</h1>
-        <p>Hello, this is a website that shares the best roblox executors and scripts .</p>
-      </div>
-      <div class="animated-background">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-      </div>
+    <header class="header">
+        <div class="container">
+            <div class="logo">SPDM Team</div>
+            <nav class="navbar">
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+            <i class="bx bx-menu" id="menu-icon"></i>
+        </div>
+    </header>
+    <div class="nav-bg"></div>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Welcome to SPDM Team</h1>
+            <p>Innovative solutions for a better future.</p>
+            <a href="#about" class="btn">Learn More</a>
+        </div>
     </section>
-  </main>
-  <script src="script.js"></script>
+    <section id="about" class="about">
+        <h2>About Us</h2>
+        <p>We are a team of professionals dedicated to delivering top-notch services in technology and design.</p>
+    </section>
+    <footer class="footer">
+        <p>&copy; 2025 SPDM Team. All Rights Reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
-</html>
+      </html>
