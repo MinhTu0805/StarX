@@ -161,6 +161,33 @@
             font-family: 'Courier New', monospace;
             font-size: 14px;
         }
+        .slide-container {
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background: #fff;
+        }
+        .slide {
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .slide-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a73e8;
+            margin-bottom: 5px;
+        }
+        .slide-content {
+            font-size: 14px;
+            color: #333;
+        }
         .code-block {
             position: relative;
             margin: 10px 0;
@@ -185,7 +212,7 @@
             padding: 4px 8px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 12px;
+            font-size:asm 12px;
             transition: background 0.2s;
         }
         .copy-btn:hover {
@@ -296,6 +323,20 @@
         }
         body.dark .message-content code:not(.prism-code) {
             background: #555;
+            color: #ddd;
+        }
+        body.dark .slide-container {
+            background: #333;
+            border-color: #555;
+        }
+        body.dark .slide {
+            background: #444;
+            border-color: #666;
+        }
+        body.dark .slide-title {
+            color: #1e90ff;
+        }
+        body.dark .slide-content {
             color: #ddd;
         }
         body.dark .code-block {
@@ -418,8 +459,8 @@
                 <input type="file" id="file-input" accept=".txt,.pdf,.jpg,.png,.jpeg,.ppt,.pptx">
             </div>
             <div class="prompt-suggestions">
-                <button class="suggestion">Hôm nay là thứ mấy?</button>
-                <button class="suggestion">Viết một bài thơ ngắn.</button>
+                <button class="suggestion">Thời tiết hôm nay thế nào?</button>
+                <button class="suggestion">Quang Hùng MasterD là ai?</button>
                 <button class="suggestion">Bây giờ là mấy giờ?</button>
             </div>
         </div>
@@ -544,7 +585,7 @@
             chatBody.scrollTop = chatBody.scrollHeight;
         }
 
-        function addBotMessage(content, callback, imageSrc = null) {
+        function addBotMessage(content, callback, imageSrc = null, slides = null) {
             if (!isResponding) return;
             currentBotMessage = document.createElement('div');
             currentBotMessage.classList.add('message', 'bot');
@@ -562,7 +603,7 @@
             chatBody.scrollTop = chatBody.scrollHeight;
 
             const hasCode = /```[\s\S]*?```/.test(content);
-            let formattedContent;
+            let formattedContent = content;
             if (hasCode) {
                 formattedContent = marked.parse(content, { gfm: true, breaks: true });
                 formattedContent = formattedContent.replace(/<pre><code class="language-(\w+)">([\s\S]*?)<\/code><\/pre>/g, (match, lang, code) => {
@@ -596,6 +637,20 @@
                 } else {
                     if (hasCode) {
                         Prism.highlightAllUnder(messageContent);
+                    }
+                    if (slides && slides.length > 0) {
+                        const slideContainer = document.createElement('div');
+                        slideContainer.classList.add('slide-container');
+                        slides.forEach((slide, i) => {
+                            const slideDiv = document.createElement('div');
+                            slideDiv.classList.add('slide');
+                            slideDiv.innerHTML = `
+                                <div class="slide-title">Slide ${i + 1}: ${escapeHTML(slide.title)}</div>
+                                <div class="slide-content">${escapeHTML(slide.content)}</div>
+                            `;
+                            slideContainer.appendChild(slideDiv);
+                        });
+                        messageContent.appendChild(slideContainer);
                     }
                     isResponding = false;
                     callback();
@@ -679,18 +734,24 @@
                         try {
                             const zip = await JSZip.loadAsync(reader.result);
                             let text = '';
-                            const slideFiles = Object.keys(zip.files).filter(f => f.startsWith('ppt/slides/slide'));
+                            const slides = [];
+                            const slideFiles = Object.keys(zip.files).filter(f => f.startsWith('ppt/slides/slide')).sort();
                             for (const slideFile of slideFiles) {
                                 const xml = await zip.file(slideFile).async('string');
                                 const parser = new DOMParser();
                                 const doc = parser.parseFromString(xml, 'application/xml');
                                 const textNodes = doc.getElementsByTagName('a:t');
+                                let slideText = [];
                                 for (let i = 0; i < textNodes.length; i++) {
-                                    text += textNodes[i].textContent + ' ';
+                                    const text = textNodes[i].textContent.trim();
+                                    if (text) slideText.push(text);
                                 }
-                                text += '\n';
+                                text += slideText.join(' ') + '\n';
+                                const title = slideText[0] || `Slide ${slides.length + 1}`;
+                                const content = slideText.slice(1).join('\n') || 'Không có nội dung.';
+                                slides.push({ title, content });
                             }
-                            resolve({ type: 'text', content: text.trim() });
+                            resolve({ type: 'powerpoint', content: text.trim(), slides: slides.slice(0, 10) });
                         } catch (error) {
                             reject('Lỗi đọc file PowerPoint');
                         }
@@ -816,6 +877,7 @@ Hãy đảm bảo nội dung ngắn gọn, rõ ràng và phù hợp để dán v
 
             let botReply;
             let imageSrc = null;
+            let slides = null;
             const lowerMessage = message.toLowerCase();
 
             if (lowerMessage.includes('mấy giờ') || lowerMessage.includes('hôm nay') || lowerMessage.includes('thứ mấy') || lowerMessage.includes('ngày giờ')) {
@@ -838,6 +900,14 @@ Hãy đảm bảo nội dung ngắn gọn, rõ ràng và phù hợp để dán v
                             prompt = message || 'Mô tả nội dung hình ảnh này.';
                             botReply = await sendMessageToGemini(prompt, fileData.base64);
                             imageSrc = fileData.url;
+                        } else if (fileData.type === 'powerpoint') {
+                            addUserMessage(`Đã gửi file: ${fileInput.files[0].name}`);
+                            slides = fileData.slides;
+                            prompt = `Dựa trên nội dung tài liệu sau, trả lời câu hỏi: ${message || 'Tóm tắt nội dung'}\n\nTài liệu:\n${fileData.content}`;
+                            botReply = await sendMessageToGemini(prompt);
+                            if (!message) {
+                                botReply = `Nội dung file PowerPoint:\n${botReply}\n\nDưới đây là các slide:`;
+                            }
                         } else {
                             addUserMessage(`Đã gửi file: ${fileInput.files[0].name}`);
                             prompt = `Dựa trên nội dung tài liệu sau, trả lời câu hỏi: ${message || 'Tóm tắt nội dung'}\n\nTài liệu:\n${fileData.content}`;
@@ -877,7 +947,7 @@ Hãy đảm bảo nội dung ngắn gọn, rõ ràng và phù hợp để dán v
                     sendIcon.classList.remove('fa-square');
                     sendIcon.classList.add('fa-arrow-up');
                     isResponding = false;
-                }, imageSrc);
+                }, imageSrc, slides);
             } else if (!isResponding) {
                 const sendIcon = sendBtn.querySelector('i');
                 sendIcon.classList.remove('fa-square');
