@@ -145,6 +145,7 @@
             max-width: 100%;
             border-radius: 8px;
             margin-top: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             display: block;
         }
         .message-content strong {
@@ -231,7 +232,7 @@
             display: flex;
             gap: 8px;
         }
-        #upload-btn, #deepsearch-btn, #deepthink-btn, #generate-image-btn, #send-btn {
+        #upload-btn, #deepsearch-btn, #deepthink-btn, #send-btn {
             background: #1a73e8;
             border: none;
             width: 40px;
@@ -245,7 +246,7 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        #upload-btn:hover, #deepsearch-btn:hover, #deepthink-btn:hover, #generate-image-btn:hover, #send-btn:hover {
+        #upload-btn:hover, #deepsearch-btn:hover, #deepthink-btn:hover, #send-btn:hover {
             background: #1557b0;
         }
         #file-input {
@@ -270,22 +271,6 @@
         .suggestion:hover {
             background: #e0e0e0;
         }
-        .spinner {
-            display: none;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #1a73e8;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        .spinner.active {
-            display: inline-block;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
         body.dark {
             background: linear-gradient(135deg, #1c2526, #2e3b4e);
         }
@@ -305,6 +290,9 @@
         body.dark .message.bot .message-content {
             background: #444;
             color: #fff;
+        }
+        body.dark .message-content img {
+            box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
         }
         body.dark .message-content code:not(.prism-code) {
             background: #555;
@@ -369,7 +357,7 @@
             #user-input {
                 font-size: 14px;
             }
-            #upload-btn, #deepsearch-btn, #deepthink-btn, #generate-image-btn, #send-btn {
+            #upload-btn, #deepsearch-btn, #deepthink-btn, #send-btn {
                 width: 36px;
                 height: 36px;
                 font-size: 16px;
@@ -411,7 +399,7 @@
             <div class="chat-input">
                 <input type="text" id="user-input" placeholder="Hỏi tôi bất cứ điều gì...">
                 <div class="input-buttons">
-                    <button id="upload-btn" title="Gửi tài liệu/ảnh">
+                    <button id="upload-btn" title="Gửi tài liệu hoặc hình ảnh">
                         <i class="fas fa-paperclip"></i>
                     </button>
                     <button id="deepsearch-btn" title="DeepSearch">
@@ -420,20 +408,16 @@
                     <button id="deepthink-btn" title="DeepThink">
                         <i class="fas fa-lightbulb"></i>
                     </button>
-                    <button id="generate-image-btn" title="Tạo ảnh với Imagen 3">
-                        <i class="fas fa-image"></i>
-                    </button>
                     <button id="send-btn" title="Gửi">
                         <i class="fas fa-arrow-up"></i>
                     </button>
                 </div>
-                <input type="file" id="file-input" accept=".txt,.pdf,.jpg,.jpeg,.png">
+                <input type="file" id="file-input" accept=".txt,.pdf,.jpg,.png,.jpeg">
             </div>
             <div class="prompt-suggestions">
-                <button class="suggestion">Hôm nay là thứ mấy?</button>
+                <button class="suggestion">Hôm nay là thứ mấy</button>
                 <button class="suggestion">Viết một bài thơ ngắn.</button>
                 <button class="suggestion">Bây giờ là mấy giờ?</button>
-                <button class="suggestion">Tạo ảnh một khu vườn về đêm</button>
             </div>
         </div>
     </div>
@@ -448,7 +432,6 @@
         const uploadBtn = document.getElementById('upload-btn');
         const deepsearchBtn = document.getElementById('deepsearch-btn');
         const deepthinkBtn = document.getElementById('deepthink-btn');
-        const generateImageBtn = document.getElementById('generate-image-btn');
         const fileInput = document.getElementById('file-input');
         const toggleThemeBtn = document.getElementById('toggle-theme');
         const toggleSidebarBtn = document.getElementById('toggle-sidebar');
@@ -457,12 +440,9 @@
         const chatHistory = document.getElementById('chat-history');
         const suggestions = document.querySelectorAll('.suggestion');
 
-        const GEMINI_API_KEY = 'AIzaSyAGXTME-OHwEA5WDl2ms3Uw31gGLJxwcnE';
-        const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
+        const API_KEY = 'AIzaSyAGXTME-OHwEA5WDl2ms3Uw31gGLJxwcnE';
+        const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
         const SERPAPI_KEY = 'a6aacc70569b932c08131ff744ce80b46921285d0af5c5db2cb4db3415d57a7d';
-        // Thay bằng Vertex AI Imagen 3 API key của bạn
-        const IMAGEN_API_KEY = 'YOUR_VERTEX_AI_IMAGEN_KEY';
-        const IMAGEN_API_URL = 'https://us-central1-aiplatform.googleapis.com/v1/projects/YOUR_PROJECT_ID/locations/us-central1/publishers/google/models/imagen-3.0-generate-002:predict';
 
         let isResponding = false;
         let typingTimeout = null;
@@ -528,76 +508,6 @@
             }
         }
 
-        async function generateImageWithImagen3(prompt) {
-            try {
-                abortController = new AbortController();
-                const response = await fetch(IMAGEN_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${IMAGEN_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        instances: [{ prompt: prompt }],
-                        parameters: {
-                            sampleCount: 1,
-                            aspectRatio: '1:1',
-                            outputMimeType: 'image/png'
-                        }
-                    }),
-                    signal: abortController.signal
-                });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
-                return data.predictions[0].image.base64; // Giả định trả về base64
-            } catch (error) {
-                if (error.name === 'AbortError') {
-                    return null;
-                }
-                console.error('Lỗi tạo ảnh Imagen 3:', error);
-                return null;
-            }
-        }
-
-        async function analyzeImage(file) {
-            try {
-                const reader = new FileReader();
-                return new Promise((resolve, reject) => {
-                    reader.onload = async () => {
-                        const base64Image = reader.result.split(',')[1];
-                        abortController = new AbortController();
-                        const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                contents: [{
-                                    parts: [
-                                        { text: 'Phân tích và mô tả nội dung của hình ảnh này.' },
-                                        { inline_data: { mime_type: file.type, data: base64Image } }
-                                    ]
-                                }]
-                            }),
-                            signal: abortController.signal
-                        });
-                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                        const data = await response.json();
-                        resolve({
-                            description: data.candidates[0].content.parts[0].text,
-                            base64: reader.result
-                        });
-                    };
-                    reader.onerror = () => reject('Lỗi đọc file ảnh');
-                    reader.readAsDataURL(file);
-                });
-            } catch (error) {
-                if (error.name === 'AbortError') {
-                    return null;
-                }
-                console.error('Lỗi phân tích ảnh:', error);
-                return null;
-            }
-        }
-
         const trustedSources = {
             'Quang Hùng MasterD': {
                 realName: 'Lê Quang Hùng',
@@ -617,25 +527,31 @@
             return response;
         }
 
-        function addUserMessage(content, image = null) {
+        function addUserMessage(content, imageSrc = null) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', 'user');
-            let html = `<div class="message-content">${escapeHTML(content)}`;
-            if (image) {
-                html += `<img src="${image}" alt="Uploaded image">`;
+            let messageContent = `<div class="message-content">${escapeHTML(content)}</div>`;
+            if (imageSrc) {
+                messageContent = `<div class="message-content"><img src="${imageSrc}" alt="Hình ảnh người dùng gửi" /><br>${escapeHTML(content)}</div>`;
             }
-            html += `</div>`;
-            messageDiv.innerHTML = html;
+            messageDiv.innerHTML = messageContent;
             chatBody.appendChild(messageDiv);
             chatBody.scrollTop = chatBody.scrollHeight;
         }
 
-        function addBotMessage(content, image = null, callback) {
+        function addBotMessage(content, callback, imageSrc = null) {
             if (!isResponding) return;
             currentBotMessage = document.createElement('div');
             currentBotMessage.classList.add('message', 'bot');
             const messageContent = document.createElement('div');
             messageContent.classList.add('message-content');
+            if (imageSrc) {
+                const img = document.createElement('img');
+                img.src = imageSrc;
+                img.alt = 'Hình ảnh từ bot';
+                messageContent.appendChild(img);
+                messageContent.appendChild(document.createElement('br'));
+            }
             currentBotMessage.appendChild(messageContent);
             chatBody.appendChild(currentBotMessage);
             chatBody.scrollTop = chatBody.scrollHeight;
@@ -661,10 +577,6 @@
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/\*(.*?)\*/g, '<em>$1</em>')
                     .replace(/`(.*?)`/g, '<code>$1</code>');
-            }
-
-            if (image) {
-                formattedContent += `<img src="data:image/png;base64,${image}" alt="Generated image">`;
             }
 
             let index = 0;
@@ -721,9 +633,21 @@
 
         async function readFile(file) {
             return new Promise((resolve, reject) => {
-                if (file.type === 'text/plain') {
+                if (file.type.startsWith('image/')) {
+                    if (file.size > 20 * 1024 * 1024) {
+                        reject('Hình ảnh quá lớn (tối đa 20MB).');
+                        return;
+                    }
                     const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
+                    reader.onload = () => {
+                        const base64 = reader.result.split(',')[1];
+                        resolve({ type: 'image', base64, url: URL.createObjectURL(file) });
+                    };
+                    reader.onerror = () => reject('Lỗi đọc hình ảnh');
+                    reader.readAsDataURL(file);
+                } else if (file.type === 'text/plain') {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve({ type: 'text', content: reader.result });
                     reader.onerror = () => reject('Lỗi đọc file TXT');
                     reader.readAsText(file);
                 } else if (file.type === 'application/pdf') {
@@ -737,7 +661,7 @@
                                 const content = await page.getTextContent();
                                 text += content.items.map(item => item.str).join(' ') + '\n';
                             }
-                            resolve(text);
+                            resolve({ type: 'text', content: text });
                         } catch (error) {
                             reject('Lỗi đọc file PDF');
                         }
@@ -750,15 +674,26 @@
             });
         }
 
-        async function sendMessageToGemini(message) {
+        async function sendMessageToGemini(message, imageBase64 = null) {
             try {
                 abortController = new AbortController();
-                const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+                const body = {
+                    contents: [{
+                        parts: [{ text: message }]
+                    }]
+                };
+                if (imageBase64) {
+                    body.contents[0].parts.push({
+                        inline_data: {
+                            mime_type: 'image/jpeg',
+                            data: imageBase64
+                        }
+                    });
+                }
+                const response = await fetch(`${API_URL}?key=${API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: message }] }]
-                    }),
+                    body: JSON.stringify(body),
                     signal: abortController.signal
                 });
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -769,7 +704,7 @@
                     return '';
                 }
                 console.error('Error calling Gemini API:', error);
-                return 'Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại!';
+                return 'Xin lỗi, đã có lỗi xảy ra khi phân tích hình ảnh. Vui lòng thử lại!';
             }
         }
 
@@ -780,7 +715,7 @@
             }
 
             const message = userInput.value.trim();
-            if (!message && mode !== 'upload' && mode !== 'generate-image') return;
+            if (!message && mode !== 'upload') return;
 
             if (message) {
                 addUserMessage(message);
@@ -793,7 +728,7 @@
             isResponding = true;
 
             let botReply;
-            let generatedImage = null;
+            let imageSrc = null;
             const lowerMessage = message.toLowerCase();
 
             if (lowerMessage.includes('mấy giờ') || lowerMessage.includes('hôm nay') || lowerMessage.includes('thứ mấy') || lowerMessage.includes('ngày giờ')) {
@@ -809,35 +744,22 @@
                     addBotMessage('Đang suy nghĩ sâu...', () => {});
                     prompt = `Suy nghĩ kỹ lưỡng và phân tích trước khi trả lời: ${message}.`;
                 } else if (mode === 'upload' && fileInput.files[0]) {
-                    const file = fileInput.files[0];
-                    if (file.type.startsWith('image/')) {
-                        addBotMessage('Đang phân tích hình ảnh...', () => {});
-                        const result = await analyzeImage(file);
-                        if (result && isResponding) {
-                            addUserMessage(`Đã gửi ảnh: ${file.name}`, result.base64);
-                            botReply = result.description;
+                    try {
+                        const fileData = await readFile(fileInput.files[0]);
+                        if (fileData.type === 'image') {
+                            addUserMessage(`Đã gửi hình ảnh: ${fileInput.files[0].name}`, fileData.url);
+                            prompt = message || 'Mô tả nội dung hình ảnh này.';
+                            botReply = await sendMessageToGemini(prompt, fileData.base64);
+                            imageSrc = fileData.url; // Hiển thị hình ảnh gốc trong phản hồi bot
                         } else {
-                            botReply = 'Không thể phân tích hình ảnh. Vui lòng thử lại.';
-                        }
-                        fileInput.value = '';
-                    } else {
-                        try {
-                            const fileContent = await readFile(file);
-                            prompt = `Dựa trên nội dung tài liệu sau, trả lời câu hỏi: ${message || 'Tóm tắt nội dung'}\n\nTài liệu:\n${fileContent}`;
                             addUserMessage(`Đã gửi file: ${fileInput.files[0].name}`);
-                        } catch (error) {
-                            botReply = error;
+                            prompt = `Dựa trên nội dung tài liệu sau, trả lời câu hỏi: ${message || 'Tóm tắt nội dung'}\n\nTài liệu:\n${fileData.content}`;
+                            botReply = await sendMessageToGemini(prompt);
                         }
-                        fileInput.value = '';
+                    } catch (error) {
+                        botReply = error;
                     }
-                } else if (mode === 'generate-image') {
-                    addBotMessage('Đang tạo hình ảnh với Imagen 3...', () => {});
-                    generatedImage = await generateImageWithImagen3(message);
-                    if (generatedImage && isResponding) {
-                        botReply = 'Hình ảnh đã được tạo:';
-                    } else {
-                        botReply = 'Không thể tạo hình ảnh. Vui lòng kiểm tra prompt hoặc API key.';
-                    }
+                    fileInput.value = '';
                 }
 
                 if (!botReply) {
@@ -863,12 +785,12 @@
             }
 
             if (botReply && isResponding) {
-                addBotMessage(botReply, generatedImage, () => {
+                addBotMessage(botReply, () => {
                     const sendIcon = sendBtn.querySelector('i');
                     sendIcon.classList.remove('fa-square');
                     sendIcon.classList.add('fa-arrow-up');
                     isResponding = false;
-                });
+                }, imageSrc);
             } else if (!isResponding) {
                 const sendIcon = sendBtn.querySelector('i');
                 sendIcon.classList.remove('fa-square');
@@ -897,15 +819,10 @@
         });
         deepsearchBtn.addEventListener('click', () => sendMessage('deepsearch'));
         deepthinkBtn.addEventListener('click', () => sendMessage('deepthink'));
-        generateImageBtn.addEventListener('click', () => sendMessage('generate-image'));
         suggestions.forEach(suggestion => {
             suggestion.addEventListener('click', () => {
                 userInput.value = suggestion.textContent;
-                if (suggestion.textContent.includes('Tạo ảnh')) {
-                    sendMessage('generate-image');
-                } else {
-                    sendMessage('normal');
-                }
+                sendMessage('normal');
             });
         });
         toggleThemeBtn.addEventListener('click', () => {
