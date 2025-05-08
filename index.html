@@ -232,7 +232,7 @@
             display: flex;
             gap: 8px;
         }
-        #upload-btn, #deepsearch-btn, #deepthink-btn, #send-btn {
+        #upload-btn, #studio-btn, #deepsearch-btn, #deepthink-btn, #send-btn {
             background: #1a73e8;
             border: none;
             width: 40px;
@@ -246,7 +246,7 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        #upload-btn:hover, #deepsearch-btn:hover, #deepthink-btn:hover, #send-btn:hover {
+        #upload-btn:hover, #studio-btn:hover, #deepsearch-btn:hover, #deepthink-btn:hover, #send-btn:hover {
             background: #1557b0;
         }
         #file-input {
@@ -357,7 +357,7 @@
             #user-input {
                 font-size: 14px;
             }
-            #upload-btn, #deepsearch-btn, #deepthink-btn, #send-btn {
+            #upload-btn, #studio-btn, #deepsearch-btn, #deepthink-btn, #send-btn {
                 width: 36px;
                 height: 36px;
                 font-size: 16px;
@@ -402,6 +402,9 @@
                     <button id="upload-btn" title="Gửi tài liệu hoặc hình ảnh">
                         <i class="fas fa-paperclip"></i>
                     </button>
+                    <button id="studio-btn" title="Tạo slide PowerPoint với Google AI">
+                        <i class="fas fa-chalkboard"></i>
+                    </button>
                     <button id="deepsearch-btn" title="DeepSearch">
                         <i class="fas fa-search"></i>
                     </button>
@@ -412,11 +415,11 @@
                         <i class="fas fa-arrow-up"></i>
                     </button>
                 </div>
-                <input type="file" id="file-input" accept=".txt,.pdf,.jpg,.png,.jpeg">
+                <input type="file" id="file-input" accept=".txt,.pdf,.jpg,.png,.jpeg,.ppt,.pptx">
             </div>
             <div class="prompt-suggestions">
-                <button class="suggestion">Thời tiết hôm nay thế nào?</button>
-                <button class="suggestion">Quang Hùng MasterD là ai?</button>
+                <button class="suggestion">Hôm nay là thứ mấy?</button>
+                <button class="suggestion">Viết một bài thơ ngắn.</button>
                 <button class="suggestion">Bây giờ là mấy giờ?</button>
             </div>
         </div>
@@ -425,11 +428,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
         const chatBody = document.getElementById('chat-body');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
         const uploadBtn = document.getElementById('upload-btn');
+        const studioBtn = document.getElementById('studio-btn');
         const deepsearchBtn = document.getElementById('deepsearch-btn');
         const deepthinkBtn = document.getElementById('deepthink-btn');
         const fileInput = document.getElementById('file-input');
@@ -668,6 +673,30 @@
                     };
                     reader.onerror = () => reject('Lỗi đọc file PDF');
                     reader.readAsArrayBuffer(file);
+                } else if (file.type === 'application/vnd.ms-powerpoint' || file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
+                    const reader = new FileReader();
+                    reader.onload = async () => {
+                        try {
+                            const zip = await JSZip.loadAsync(reader.result);
+                            let text = '';
+                            const slideFiles = Object.keys(zip.files).filter(f => f.startsWith('ppt/slides/slide'));
+                            for (const slideFile of slideFiles) {
+                                const xml = await zip.file(slideFile).async('string');
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(xml, 'application/xml');
+                                const textNodes = doc.getElementsByTagName('a:t');
+                                for (let i = 0; i < textNodes.length; i++) {
+                                    text += textNodes[i].textContent + ' ';
+                                }
+                                text += '\n';
+                            }
+                            resolve({ type: 'text', content: text.trim() });
+                        } catch (error) {
+                            reject('Lỗi đọc file PowerPoint');
+                        }
+                    };
+                    reader.onerror = () => reject('Lỗi đọc file PowerPoint');
+                    reader.readAsArrayBuffer(file);
                 } else {
                     reject('Định dạng file không hỗ trợ');
                 }
@@ -703,6 +732,66 @@
                 }
                 console.error('Error calling Gemini API:', error);
                 return 'Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại!';
+            }
+        }
+
+        async function createSlideContent(topic) {
+            const prompt = `Tạo nội dung cho một bài thuyết trình PowerPoint về chủ đề: "${topic}". Cung cấp định dạng sau:
+- **Tiêu đề slide 1**: [Tiêu đề]
+  - Nội dung: [Danh sách ý chính hoặc mô tả ngắn]
+- **Tiêu đề slide 2**: [Tiêu đề]
+  - Nội dung: [Danh sách ý chính hoặc mô tả ngắn]
+- **Tiêu đề slide 3**: [Tiêu đề]
+  - Nội dung: [Danh sách ý chính hoặc mô tả ngắn]
+Hãy đảm bảo nội dung ngắn gọn, rõ ràng và phù hợp để dán vào Google Slides.`;
+            const content = await sendMessageToGemini(prompt);
+            return content;
+        }
+
+        async function studioMode() {
+            if (isResponding) {
+                cancelResponse();
+                return;
+            }
+
+            const topic = userInput.value.trim() || 'Chủ đề mẫu';
+            userInput.value = '';
+
+            const sendIcon = sendBtn.querySelector('i');
+            sendIcon.classList.remove('fa-arrow-up');
+            sendIcon.classList.add('fa-square');
+            isResponding = true;
+
+            addBotMessage('Đang tạo nội dung slide PowerPoint...', () => {});
+
+            try {
+                const slideContent = await createSlideContent(topic);
+                addBotMessage(`Nội dung slide đã tạo:\n\n${slideContent}\n\nSao chép nội dung trên và dán vào Google Slides để tạo bài thuyết trình. Nhấn nút này để mở Google Slides:`, () => {
+                    const sendIcon = sendBtn.querySelector('i');
+                    sendIcon.classList.remove('fa-square');
+                    sendIcon.classList.add('fa-arrow-up');
+                    isResponding = false;
+
+                    navigator.clipboard.writeText(slideContent).then(() => {
+                        window.open('https://slides.google.com', '_blank');
+                    });
+                });
+
+                const historyItem = document.createElement('li');
+                historyItem.textContent = `Tạo slide: ${topic.slice(0, 30)}${topic.length > 30 ? '...' : ''}`;
+                chatHistory.appendChild(historyItem);
+            } catch (error) {
+                addBotMessage(`Lỗi khi tạo slide: ${error}`, () => {
+                    const sendIcon = sendBtn.querySelector('i');
+                    sendIcon.classList.remove('fa-square');
+                    sendIcon.classList.add('fa-arrow-up');
+                    isResponding = false;
+                });
+            }
+
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
             }
         }
 
@@ -748,7 +837,7 @@
                             addUserMessage(`Đã gửi hình ảnh: ${fileInput.files[0].name}`, fileData.url);
                             prompt = message || 'Mô tả nội dung hình ảnh này.';
                             botReply = await sendMessageToGemini(prompt, fileData.base64);
-                            imageSrc = fileData.url; // Hiển thị ảnh trong tin nhắn bot nếu cần
+                            imageSrc = fileData.url;
                         } else {
                             addUserMessage(`Đã gửi file: ${fileInput.files[0].name}`);
                             prompt = `Dựa trên nội dung tài liệu sau, trả lời câu hỏi: ${message || 'Tóm tắt nội dung'}\n\nTài liệu:\n${fileData.content}`;
@@ -815,6 +904,7 @@
         fileInput.addEventListener('change', () => {
             if (fileInput.files.length > 0) sendMessage('upload');
         });
+        studioBtn.addEventListener('click', studioMode);
         deepsearchBtn.addEventListener('click', () => sendMessage('deepsearch'));
         deepthinkBtn.addEventListener('click', () => sendMessage('deepthink'));
         suggestions.forEach(suggestion => {
