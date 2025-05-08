@@ -64,6 +64,23 @@
         #chat-history li:hover {
             background: #e0e0e0;
         }
+        #clear-history {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: #e63946;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        #clear-history:hover {
+            background: #d00000;
+        }
         .overlay {
             display: none;
             position: fixed;
@@ -212,7 +229,7 @@
             padding: 4px 8px;
             border-radius: 4px;
             cursor: pointer;
-            font-size:asm 12px;
+            font-size: 12px;
             transition: background 0.2s;
         }
         .copy-btn:hover {
@@ -364,6 +381,12 @@
             border-color: #555;
             color: #fff;
         }
+        body.dark #clear-history {
+            background: #e63946;
+        }
+        body.dark #clear-history:hover {
+            background: #d00000;
+        }
         @media (max-width: 768px) {
             .container {
                 width: 100%;
@@ -425,6 +448,7 @@
                 <i class="fas fa-robot"></i> Mint AI
             </div>
             <ul id="chat-history"></ul>
+            <button id="clear-history">Xóa lịch sử trò chuyện</button>
         </div>
         <div class="chat-area">
             <div class="chat-header">
@@ -484,6 +508,7 @@
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
         const chatHistory = document.getElementById('chat-history');
+        const clearHistoryBtn = document.getElementById('clear-history');
         const suggestions = document.querySelectorAll('.suggestion');
 
         const API_KEY = 'AIzaSyAGXTME-OHwEA5WDl2ms3Uw31gGLJxwcnE';
@@ -494,9 +519,39 @@
         let typingTimeout = null;
         let abortController = null;
         let currentBotMessage = null;
+        let chatHistoryMessages = JSON.parse(localStorage.getItem('chatHistory')) || [];
 
         function escapeHTML(str) {
             return str.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+        }
+
+        function saveChatHistory() {
+            localStorage.setItem('chatHistory', JSON.stringify(chatHistoryMessages));
+        }
+
+        function loadChatHistory() {
+            chatHistoryMessages.forEach(msg => {
+                if (msg.role === 'user') {
+                    addUserMessage(msg.content, msg.imageSrc);
+                } else {
+                    addBotMessage(msg.content, () => {}, msg.imageSrc, msg.slides);
+                }
+            });
+            chatHistory.innerHTML = '';
+            chatHistoryMessages
+                .filter(msg => msg.role === 'user' && msg.content)
+                .forEach(msg => {
+                    const historyItem = document.createElement('li');
+                    historyItem.textContent = msg.content.slice(0, 30) + (msg.content.length > 30 ? '...' : '');
+                    chatHistory.appendChild(historyItem);
+                });
+        }
+
+        function clearChatHistory() {
+            localStorage.removeItem('chatHistory');
+            chatHistoryMessages = [];
+            chatHistory.innerHTML = '';
+            chatBody.innerHTML = '';
         }
 
         function getRealTime(message) {
@@ -583,6 +638,15 @@
             messageDiv.innerHTML = messageContent;
             chatBody.appendChild(messageDiv);
             chatBody.scrollTop = chatBody.scrollHeight;
+
+            chatHistoryMessages.push({
+                role: 'user',
+                content,
+                imageSrc,
+                slides: null,
+                timestamp: new Date().toISOString()
+            });
+            saveChatHistory();
         }
 
         function addBotMessage(content, callback, imageSrc = null, slides = null) {
@@ -652,6 +716,14 @@
                         });
                         messageContent.appendChild(slideContainer);
                     }
+                    chatHistoryMessages.push({
+                        role: 'model',
+                        content,
+                        imageSrc,
+                        slides,
+                        timestamp: new Date().toISOString()
+                    });
+                    saveChatHistory();
                     isResponding = false;
                     callback();
                 }
@@ -767,11 +839,18 @@
         async function sendMessageToGemini(message, imageBase64 = null) {
             try {
                 abortController = new AbortController();
+                const history = chatHistoryMessages.slice(-10).map(msg => ({
+                    role: msg.role,
+                    parts: [{ text: msg.content }]
+                }));
                 const body = {
-                    contents: [{ parts: [{ text: message }] }]
+                    contents: [
+                        ...history,
+                        { role: 'user', parts: [{ text: message }] }
+                    ]
                 };
                 if (imageBase64) {
-                    body.contents[0].parts.push({
+                    body.contents[body.contents.length - 1].parts.push({
                         inline_data: {
                             mime_type: 'image/jpeg',
                             data: imageBase64
@@ -796,17 +875,28 @@
             }
         }
 
-        async function createSlideContent(topic) {
-            const prompt = `Tạo nội dung cho một bài thuyết trình PowerPoint về chủ đề: "${topic}". Cung cấp định dạng sau:
-- **Tiêu đề slide 1**: [Tiêu đề]
-  - Nội dung: [Danh sách ý chính hoặc mô tả ngắn]
-- **Tiêu đề slide 2**: [Tiêu đề]
-  - Nội dung: [Danh sách ý chính hoặc mô tả ngắn]
-- **Tiêu đề slide 3**: [Tiêu đề]
-  - Nội dung: [Danh sách ý chính hoặc mô tả ngắn]
-Hãy đảm bảo nội dung ngắn gọn, rõ ràng và phù hợp để dán vào Google Slides.`;
-            const content = await sendMessageToGemini(prompt);
-            return content;
+        async function createSlideContent(topic, additional = false) {
+            const prompt = additional
+                ? `Thêm một slide mới cho bài thuyết trình PowerPoint về chủ đề: "${topic}". Trả về định dạng JSON với 1 slide, tối đa 50 từ:
+{
+  "slides": [
+    {"title": "Tiêu đề slide", "content": "Nội dung ngắn gọn"}
+  ]
+}`
+                : `Tạo nội dung cho một bài thuyết trình PowerPoint về chủ đề: "${topic}". Trả về định dạng JSON với 2 slide, mỗi slide tối đa 50 từ:
+{
+  "slides": [
+    {"title": "Tiêu đề slide 1", "content": "Nội dung ngắn gọn"},
+    {"title": "Tiêu đề slide 2", "content": "Nội dung ngắn gọn"}
+  ]
+}`;
+            const response = await sendMessageToGemini(prompt);
+            try {
+                const json = JSON.parse(response.replace(/```json\n([\s\S]*?)\n```/, '$1'));
+                return json.slides;
+            } catch (error) {
+                return [{ title: "Slide", content: "Lỗi định dạng nội dung. Vui lòng thử lại." }];
+            }
         }
 
         async function studioMode() {
@@ -815,7 +905,20 @@ Hãy đảm bảo nội dung ngắn gọn, rõ ràng và phù hợp để dán v
                 return;
             }
 
-            const topic = userInput.value.trim() || 'Chủ đề mẫu';
+            let topic = userInput.value.trim() || 'Chủ đề mẫu';
+            const lowerInput = topic.toLowerCase();
+            const isAdditional = lowerInput.includes('thêm') || lowerInput.includes('tiếp tục');
+            if (isAdditional) {
+                const lastStudio = chatHistoryMessages
+                    .slice()
+                    .reverse()
+                    .find(msg => msg.role === 'model' && msg.slides && msg.content.includes('Nội dung slide đã tạo'));
+                if (lastStudio) {
+                    const match = lastStudio.content.match(/chủ đề "(.*?)"/);
+                    if (match) topic = match[1];
+                }
+            }
+
             userInput.value = '';
 
             const sendIcon = sendBtn.querySelector('i');
@@ -823,20 +926,19 @@ Hãy đảm bảo nội dung ngắn gọn, rõ ràng và phù hợp để dán v
             sendIcon.classList.add('fa-square');
             isResponding = true;
 
-            addBotMessage('Đang tạo nội dung slide PowerPoint...', () => {});
-
             try {
-                const slideContent = await createSlideContent(topic);
-                addBotMessage(`Nội dung slide đã tạo:\n\n${slideContent}\n\nSao chép nội dung trên và dán vào Google Slides để tạo bài thuyết trình. Nhấn nút này để mở Google Slides:`, () => {
+                const slides = await createSlideContent(topic, isAdditional);
+                const rawContent = JSON.stringify({ slides }, null, 2);
+                addBotMessage(`Nội dung slide ${isAdditional ? 'thêm' : 'đã tạo'} cho chủ đề "${topic}":\n\nSao chép nội dung và dán vào Google Slides để tạo bài thuyết trình. Nhấn nút này để mở Google Slides:`, () => {
                     const sendIcon = sendBtn.querySelector('i');
                     sendIcon.classList.remove('fa-square');
                     sendIcon.classList.add('fa-arrow-up');
                     isResponding = false;
 
-                    navigator.clipboard.writeText(slideContent).then(() => {
+                    navigator.clipboard.writeText(rawContent).then(() => {
                         window.open('https://slides.google.com', '_blank');
                     });
-                });
+                }, null, slides);
 
                 const historyItem = document.createElement('li');
                 historyItem.textContent = `Tạo slide: ${topic.slice(0, 30)}${topic.length > 30 ? '...' : ''}`;
@@ -996,6 +1098,15 @@ Hãy đảm bảo nội dung ngắn gọn, rõ ràng và phù hợp để dán v
         overlay.addEventListener('click', () => {
             sidebar.classList.remove('active');
             overlay.classList.remove('active');
+        });
+        clearHistoryBtn.addEventListener('click', () => {
+            if (confirm('Bạn có chắc muốn xóa lịch sử trò chuyện?')) {
+                clearChatHistory();
+            }
+        });
+
+        window.addEventListener('load', () => {
+            loadChatHistory();
         });
     </script>
 </body>
