@@ -415,8 +415,8 @@
                 <input type="file" id="file-input" accept=".txt,.pdf,.jpg,.png,.jpeg">
             </div>
             <div class="prompt-suggestions">
-                <button class="suggestion">Hôm nay là thứ mấy</button>
-                <button class="suggestion">Viết một bài thơ ngắn.</button>
+                <button class="suggestion">Thời tiết hôm nay thế nào?</button>
+                <button class="suggestion">Quang Hùng MasterD là ai?</button>
                 <button class="suggestion">Bây giờ là mấy giờ?</button>
             </div>
         </div>
@@ -678,9 +678,7 @@
             try {
                 abortController = new AbortController();
                 const body = {
-                    contents: [{
-                        parts: [{ text: message }]
-                    }]
+                    contents: [{ parts: [{ text: message }] }]
                 };
                 if (imageBase64) {
                     body.contents[0].parts.push({
@@ -704,7 +702,7 @@
                     return '';
                 }
                 console.error('Error calling Gemini API:', error);
-                return 'Xin lỗi, đã có lỗi xảy ra khi phân tích hình ảnh. Vui lòng thử lại!';
+                return 'Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại!';
             }
         }
 
@@ -750,7 +748,7 @@
                             addUserMessage(`Đã gửi hình ảnh: ${fileInput.files[0].name}`, fileData.url);
                             prompt = message || 'Mô tả nội dung hình ảnh này.';
                             botReply = await sendMessageToGemini(prompt, fileData.base64);
-                            imageSrc = fileData.url; // Hiển thị hình ảnh gốc trong phản hồi bot
+                            imageSrc = fileData.url; // Hiển thị ảnh trong tin nhắn bot nếu cần
                         } else {
                             addUserMessage(`Đã gửi file: ${fileInput.files[0].name}`);
                             prompt = `Dựa trên nội dung tài liệu sau, trả lời câu hỏi: ${message || 'Tóm tắt nội dung'}\n\nTài liệu:\n${fileData.content}`;
