@@ -470,9 +470,6 @@
       'punctuation': /[(){}\[\],;]/
     };
 
-    const API_KEY = "AIzaSyAGXTME-OHwEA5WDl2ms3Uw31gGLJxwcnE";
-    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent";
-
     // Toast Notification Function
     let toastCount = 0;
     function showToast(message, type = 'success') {
@@ -484,25 +481,21 @@
       toast.innerHTML = `${icon}${message}`;
       document.body.appendChild(toast);
 
-      // Calculate position
       toastCount++;
-      const toastHeight = 44; // Approximate height of toast (32px height + 12px margin)
+      const toastHeight = 44;
       const topPosition = 20 + (toastCount - 1) * (toastHeight + 12);
       toast.style.top = `${topPosition}px`;
 
-      // Show toast
       setTimeout(() => {
         toast.classList.add('show');
       }, 100);
 
-      // Hide toast after 3 seconds
       setTimeout(() => {
         toast.classList.remove('show');
         toast.style.opacity = '0';
         setTimeout(() => {
           document.body.removeChild(toast);
           toastCount--;
-          // Adjust positions of remaining toasts
           const remainingToasts = document.querySelectorAll('.toast');
           remainingToasts.forEach((t, index) => {
             t.style.top = `${20 + index * (toastHeight + 12)}px`;
@@ -547,29 +540,124 @@
       });
     }
 
-    function encodeString(str) {
-      const key = Math.floor(Math.random() * 255) + 1;
-      const encoded = Array.from(btoa(str).replace(/=/g, '')).map(c => c.charCodeAt(0) ^ key);
-      return `{${encoded.join(',')}},${key}`;
+    // MoonSec-style string encoding (based on v7)
+    function encodeStringMoonSec(str, key) {
+      const result = [];
+      for (let i = 0; i < str.length; i++) {
+        const charCode = str.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+        result.push(charCode % 256);
+      }
+      return `{${result.join(',')}},${key}`;
     }
 
+    // Simple Luau parser to generate bytecode
+    function generateBytecode(code) {
+      const instructions = [];
+      const constants = [];
+      const strings = [];
+      const key = generateRandomString(8);
+
+      // Tokenize code (simplified)
+      const tokens = code.match(/(\b(?:local|function|end|if|then|else|while|do|for|in|return)\b|[a-zA-Z_][a-zA-Z0-9_]*|".*?"|\d+\.?\d*|[+\-*/%=<>!]+|[(){},;])/g) || [];
+
+      // Map variables to random names
+      const variableMap = {};
+      const reserved = ['local', 'function', 'end', 'if', 'then', 'else', 'while', 'do', 'for', 'in', 'return', 'utf8', 'table', 'unpack', 'math', 'print', 'bit32', 'game', 'HttpGet', 'loadstring'];
+      tokens.forEach((token, i) => {
+        if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(token) && !reserved.includes(token)) {
+          if (!variableMap[token]) {
+            variableMap[token] = generateRandomString(20);
+          }
+          tokens[i] = variableMap[token];
+        }
+      });
+
+      // Process tokens into instructions
+      let pc = 0;
+      let constIndex = 0;
+      let stringIndex = 0;
+
+      for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        if (/^\d+\.?\d*$/.test(token)) {
+          constants.push(parseFloat(token));
+          instructions.push([0, constIndex++]); // LOADCONST
+          pc++;
+        } else if (token.startsWith('"') && token.endsWith('"')) {
+          const str = token.slice(1, -1);
+          const [data, keyStr] = encodeStringMoonSec(str, key).split('},');
+          strings.push({ data, key: keyStr });
+          instructions.push([1, stringIndex++]); // LOADSTRING
+          pc++;
+        } else if (token === 'local') {
+          const varName = tokens[++i];
+          instructions.push([2, variableMap[varName] || varName]); // SETLOCAL
+          pc++;
+        } else if (token === 'function') {
+          const funcName = tokens[++i];
+          instructions.push([3, variableMap[funcName] || funcName]); // DEFFUNC
+          pc++;
+        } else if (token === '=') {
+          const varName = tokens[i - 1];
+          instructions.push([4, variableMap[varName] || varName]); // SETVAR
+          pc++;
+        } else if (token === 'return') {
+          instructions.push([5]); // RETURN
+          pc++;
+        } else if (token === '+') {
+          instructions.push([6]); // ADD
+          pc++;
+        } else if (token === '-') {
+          instructions.push([7]); // SUB
+          pc++;
+        } else if (token === '*') {
+          instructions.push([8]); // MUL
+          pc++;
+        } else if (token === '/') {
+          instructions.push([9]); // DIV
+          pc++;
+        } else if (token === 'if') {
+          instructions.push([10, pc + 2]); // JMP_IF
+          pc++;
+        } else if (token === 'then') {
+          instructions.push([11]); // THEN
+          pc++;
+        } else if (token === 'end') {
+          instructions.push([12]); // END
+          pc++;
+        } else if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(token)) {
+          instructions.push([13, variableMap[token] || token]); // LOADVAR
+          pc++;
+        }
+      }
+
+      return { instructions, constants, strings, key };
+    }
+
+    // Generate fake bytecode table
+    function generateFakeBytecode(size) {
+      return Array.from({ length: size }, () => Math.floor(Math.random() * 65536));
+    }
+
+    // Generate junk table
     function generateJunkTable(size) {
       return Array.from({ length: size }, () => Math.floor(Math.random() * 10000));
     }
 
+    // Generate junk strings
     function generateJunkStrings(size) {
       return Array.from({ length: size }, () => `"${generateRandomString(10)}"`);
     }
 
-    // Minify code to one line (for the obfuscated part)
+    // Minify code to one line
     function minifyCode(code) {
       return code
-        .replace(/\s*(\r\n|\n|\r)\s*/gm, '') // Remove newlines
-        .replace(/\s+/g, ' ') // Replace multiple spaces with single space
-        .replace(/;\s*/g, ';') // Remove spaces after semicolons
-        .replace(/\s*{\s*/g, '{') // Remove spaces around braces
-        .replace(/\s*}\s*/g, '}') // Remove spaces around braces
-        .replace(/\s*,\s*/g, ',') // Remove spaces around commas
+        .replace(/\s*(\r\n|\n|\r)\s*/gm, '')
+        .replace(/\s+/g, ' ')
+        .replace(/;\s*/g, ';')
+        .replace(/\s*{\s*/g, '{')
+        .replace(/\s*}\s*/g, '}')
+        .replace(/\s*,\s*/g, ',')
         .trim();
     }
 
@@ -624,91 +712,156 @@
         const uuid = generateUUID();
         uniqueKey.textContent = `Unique Key: ${uuid}`;
 
-        // Step 1: Send code to Mint AI (using Google Gemini API)
-        const prompt = `
-          Obfuscate the following Luau (Roblox Lua) code to make it extremely difficult to read or reverse-engineer, surpassing MoonSec V3. Use techniques like:
-          - Encoding strings into complex numerical tables with dynamic decoding
-          - Renaming variables to long, random strings
-          - Adding heavy junk code (useless loops, large tables, dummy functions)
-          - Wrapping code in multiple self-executing functions
-          - Supporting loadstring(game:HttpGet("link")) by encoding URLs
-          - Adding anti-debug checks
-          Ensure the code remains executable in Roblox. Here is the code to obfuscate:
+        // Generate bytecode
+        const { instructions, constants, strings, key } = generateBytecode(inputCode.value);
 
-          \`\`\`lua
-          ${inputCode.value}
-          \`\`\`
-
-          Return only the obfuscated code as plain text.
+        // Generate VM code (mimic MoonSec v23)
+        const vmCode = `
+          local ${generateRandomString(20)}={${instructions.map(([op, ...args]) => `{${op},${args.join(',')}}`).join(',')}};
+          local ${generateRandomString(20)}={${constants.join(',')}};
+          local ${generateRandomString(20)}={${strings.map(s => `{${s.data}}`).join(',')}};
+          local ${generateRandomString(20)}="${key}";
+          local ${generateRandomString(20)}={};
+          local ${generateRandomString(20)}={};
+          local ${generateRandomString(20)}=0;
+          local ${generateRandomString(20)}=function(...)
+            local ${generateRandomString(20)}={...};
+            local ${generateRandomString(20)}={};
+            local ${generateRandomString(20)}=0;
+            while true do
+              if ${generateRandomString(20)}>=#${generateRandomString(20)} then break end
+              ${generateRandomString(20)}=${generateRandomString(20)}+1;
+              local ${generateRandomString(20)}=${generateRandomString(20)}[${generateRandomString(20)}];
+              local ${generateRandomString(20)}=${generateRandomString(20)}[1];
+              if ${generateRandomString(20)}==0 then -- LOADCONST
+                ${generateRandomString(20)}[${generateRandomString(20)}]=${generateRandomString(20)}[${generateRandomString(20)}[2]+1];
+              elseif ${generateRandomString(20)}==1 then -- LOADSTRING
+                local ${generateRandomString(20)}=${generateRandomString(20)}[${generateRandomString(20)}[2]+1];
+                local ${generateRandomString(20)}={};
+                for ${generateRandomString(20)}=1,#${generateRandomString(20)} do
+                  ${generateRandomString(20)}[${generateRandomString(20)}]=bit32.bxor(${generateRandomString(20)}[${generateRandomString(20)}],utf8.codepoint(${generateRandomString(20)},1+(${generateRandomString(20)}-1)%#${generateRandomString(20)},1+(${generateRandomString(20)}-1)%#${generateRandomString(20)}))%256;
+                end
+                ${generateRandomString(20)}[${generateRandomString(20)}]=utf8.char(table.unpack(${generateRandomString(20)}));
+              elseif ${generateRandomString(20)}==2 then -- SETLOCAL
+                ${generateRandomString(20)}[${generateRandomString(20)}[2]]=${generateRandomString(20)}[${generateRandomString(20)}];
+              elseif ${generateRandomString(20)}==3 then -- DEFFUNC
+                ${generateRandomString(20)}[${generateRandomString(20)}[2]]=function(...) return ${generateRandomString(20)}(...) end;
+              elseif ${generateRandomString(20)}==4 then -- SETVAR
+                ${generateRandomString(20)}[${generateRandomString(20)}[2]]=${generateRandomString(20)}[${generateRandomString(20)}];
+              elseif ${generateRandomString(20)}==5 then -- RETURN
+                return ${generateRandomString(20)}[${generateRandomString(20)}];
+              elseif ${generateRandomString(20)}==6 then -- ADD
+                ${generateRandomString(20)}[${generateRandomString(20)}]=${generateRandomString(20)}[${generateRandomString(20)}]+${generateRandomString(20)}[${generateRandomString(20)}-1];
+              elseif ${generateRandomString(20)}==7 then -- SUB
+                ${generateRandomString(20)}[${generateRandomString(20)}]=${generateRandomString(20)}[${generateRandomString(20)}]-${generateRandomString(20)}[${generateRandomString(20)}-1];
+              elseif ${generateRandomString(20)}==8 then -- MUL
+                ${generateRandomString(20)}[${generateRandomString(20)}]=${generateRandomString(20)}[${generateRandomString(20)}]*${generateRandomString(20)}[${generateRandomString(20)}-1];
+              elseif ${generateRandomString(20)}==9 then -- DIV
+                ${generateRandomString(20)}[${generateRandomString(20)}]=${generateRandomString(20)}[${generateRandomString(20)}]/${generateRandomString(20)}[${generateRandomString(20)}-1];
+              elseif ${generateRandomString(20)}==10 then -- JMP_IF
+                if ${generateRandomString(20)}[${generateRandomString(20)}] then ${generateRandomString(20)}=${generateRandomString(20)}[2] end
+              elseif ${generateRandomString(20)}==11 then -- THEN
+                ${generateRandomString(20)}=${generateRandomString(20)}+1;
+              elseif ${generateRandomString(20)}==12 then -- END
+                ${generateRandomString(20)}=${generateRandomString(20)}+1;
+              elseif ${generateRandomString(20)}==13 then -- LOADVAR
+                ${generateRandomString(20)}[${generateRandomString(20)}]=${generateRandomString(20)}[${generateRandomString(20)}[2]];
+              end
+              ${generateRandomString(20)}=${generateRandomString(20)}+1;
+            end
+            return ${generateRandomString(20)}[${generateRandomString(20)}];
+          end;
+          return ${generateRandomString(20)}(...);
         `;
 
-        const response = await fetch(API_URL + `?key=${API_KEY}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{ text: prompt }]
-            }]
-          })
-        });
+        // Generate fake bytecode table
+        const fakeBytecode = generateFakeBytecode(200);
+        const fakeBytecodeCode = `
+          local ${generateRandomString(20)}={${fakeBytecode.join(',')}};
+          local ${generateRandomString(20)}=function(_t)
+            local _r=0;local _s=0;
+            while _s<20 do
+              _s=_s+1;
+              for _,_v in ipairs(_t) do _r=_r+_v end
+            end
+            return _r
+          end;
+          if ${generateRandomString(20)}(${generateRandomString(20)})>9999999 then print("Never runs") end;
+        `;
 
-        if (!response.ok) {
-          throw new Error(`Mint AI API error: ${response.statusText}`);
-        }
+        // Generate junk code
+        const junkTable = generateJunkTable(300);
+        const junkStrings = generateJunkStrings(100);
+        const junkCode = `
+          local ${generateRandomString(20)}={${junkTable.join(',')}};
+          local ${generateRandomString(20)}={${junkStrings.join(',')}};
+          local ${generateRandomString(20)}=function()
+            local _s=0;
+            while _s<10 do
+              _s=_s+1;
+              for _,${generateRandomString(15)} in pairs(${generateRandomString(20)}) do
+                if math.random()>2 then print(${generateRandomString(20)}[1]) end
+              end
+            end
+          end;
+          ${generateRandomString(20)}();
+        `;
 
-        const data = await response.json();
-        let mintObfuscatedCode = data.candidates[0].content.parts[0].text;
+        // Anti-debug check
+        const antiDebug = `
+          local ${generateRandomString(20)}=function()
+            local _s=0;
+            while true do
+              _s=_s+1;
+              if _s>50 then
+                if _G.__DEBUG__ or debug or pcall(function() return debug.getinfo(1) end) then
+                  while true do end
+                end
+                break
+              end
+            end
+          end;
+          ${generateRandomString(20)}();
+        `;
 
-        // Clean up Mint response
-        mintObfuscatedCode = mintObfuscatedCode.replace(/```lua\n|```/g, '');
+        // Complex control flow
+        const controlFlow = `
+          local ${generateRandomString(20)}=0;
+          local ${generateRandomString(20)}=function(...)
+            local _r=nil;
+            while true do
+              if ${generateRandomString(20)}==0 then
+                _r=(function(...) ${vmCode} end)(...);
+                ${generateRandomString(20)}=1
+              elseif ${generateRandomString(20)}==1 then
+                break
+              end
+            end
+            return _r
+          end;
+        `;
 
-        // Step 2: Apply local obfuscation
-        let code = mintObfuscatedCode;
-
-        // Replace variable names
-        const variableMap = {};
-        code = code.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\b/g, (match) => {
-          const reserved = ['local', 'function', 'end', 'if', 'then', 'else', 'while', 'do', 'for', 'in', 'return', 'utf8', 'table', 'unpack', 'math', 'print', 'bit32'];
-          if (reserved.includes(match)) return match;
-          if (!variableMap[match]) {
-            variableMap[match] = generateRandomString(20);
-          }
-          return variableMap[match];
-        });
-
-        // Encode strings with XOR
-        code = code.replace(/"([^"]*)"/g, (match, str) => {
-          const [data, key] = encodeString(str).split('},');
-          return `(function() local _d={${data}};local _k=${key};local _r={};for _i,_v in ipairs(_d)do _r[_i]=bit32.bxor(_v,_k)end;return utf8.char(table.unpack(_r))end)()`;
-        });
+        // Combine code
+        let code = `
+          (function(...)
+            ${fakeBytecodeCode}
+            ${junkCode}
+            ${antiDebug}
+            ${controlFlow}
+            return ${generateRandomString(20)}(...)
+          end)(...)
+        `;
 
         // Handle loadstring
         code = code.replace(/loadstring\(game:HttpGet\("([^"]*)"\)\)\(\)/g, (match, url) => {
-          const [data, key] = encodeString(url).split('},');
-          return `(function() local _d={${data}};local _k=${key};local _r={};for _i,_v in ipairs(_d)do _r[_i]=bit32.bxor(_v,_k)end;return loadstring(game:HttpGet(utf8.char(table.unpack(_r))))()end)()`;
+          const [data, keyStr] = encodeStringMoonSec(url, key).split('},');
+          return `(function() local _d={${data}};local _k="${keyStr}";local _r={};for _i=1,#_d do _r[_i]=bit32.bxor(_d[_i],utf8.codepoint(_k,1+((_i-1)%#_k),1+((_i-1)%#_k)))%256 end;return loadstring(game:HttpGet(utf8.char(table.unpack(_r))))()end)()`;
         });
 
-        // Generate fake bytecode table
-        const bytecodeTable = generateJunkTable(100);
-        const bytecodeDecoder = `local ${generateRandomString(20)}={${bytecodeTable.join(',')}};local ${generateRandomString(20)}=function(_t)local _r=0;for _,_v in ipairs(_t)do _r=_r+_v end;return _r end;if ${generateRandomString(20)}(${generateRandomString(20)})>999999 then print("Never runs")end;`;
-
-        // Add heavy junk code
-        const junkTable = generateJunkTable(200);
-        const junkStrings = generateJunkStrings(50);
-        const junkCode = `local ${generateRandomString(20)}={${junkTable.join(',')}};local ${generateRandomString(20)}={${junkStrings.join(',')}};local ${generateRandomString(20)}=function()for _,${generateRandomString(15)} in pairs(${generateRandomString(20)})do if math.random()>2 then print(${generateRandomString(20)}[1])end end end;${generateRandomString(20)}();`;
-
-        // Anti-debug check
-        const antiDebug = `local ${generateRandomString(20)}=function()if _G.__DEBUG__ then while true do end end end;${generateRandomString(20)}();`;
-
-        // Combine code
-        code = `(function(...) ${bytecodeDecoder} ${junkCode} ${antiDebug} local ${generateRandomString(20)}=function(...) local ${generateRandomString(20)}=function(...) ${code} end;return ${generateRandomString(20)}(...);end;return (function(...) local _=${generateRandomString(20)};return _(...)end)(...);end)(...)`;
-
-        // Minify the obfuscated code part
+        // Minify the obfuscated code
         const minifiedCode = minifyCode(code);
 
-        // Format output as two lines
+        // Format output
         const finalCode = `-- Obfuscated with UltraSec\n${minifiedCode}`;
 
         // Store in localStorage
@@ -781,12 +934,10 @@
 
     function copyKeyToClipboard() {
       const uniqueKey = document.getElementById('unique-key').textContent.replace('Unique Key: ', '');
-      // Try modern Clipboard API first
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(uniqueKey)
           .then(() => showToast('Unique key copied!', 'success'))
           .catch(() => {
-            // Fallback to document.execCommand
             const tempInput = document.createElement('textarea');
             tempInput.value = uniqueKey;
             document.body.appendChild(tempInput);
@@ -796,7 +947,6 @@
             showToast('Unique key copied (fallback)!', 'success');
           });
       } else {
-        // Fallback for older browsers
         const tempInput = document.createElement('textarea');
         tempInput.value = uniqueKey;
         document.body.appendChild(tempInput);
