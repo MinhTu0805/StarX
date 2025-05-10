@@ -344,7 +344,6 @@
     /* Toast Notification Styles */
     .toast {
       position: fixed;
-      top: 20px;
       right: 20px;
       padding: 12px 24px;
       border-radius: 10px;
@@ -396,7 +395,6 @@
         font-size: 0.85rem;
       }
       .toast {
-        top: 10px;
         right: 10px;
         font-size: 0.8rem;
         padding: 10px 20px;
@@ -476,6 +474,7 @@
     const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent";
 
     // Toast Notification Function
+    let toastCount = 0;
     function showToast(message, type = 'success') {
       const toast = document.createElement('div');
       toast.className = `toast ${type}`;
@@ -485,6 +484,12 @@
       toast.innerHTML = `${icon}${message}`;
       document.body.appendChild(toast);
 
+      // Calculate position
+      toastCount++;
+      const toastHeight = 44; // Approximate height of toast (32px height + 12px margin)
+      const topPosition = 20 + (toastCount - 1) * (toastHeight + 12);
+      toast.style.top = `${topPosition}px`;
+
       // Show toast
       setTimeout(() => {
         toast.classList.add('show');
@@ -493,8 +498,15 @@
       // Hide toast after 3 seconds
       setTimeout(() => {
         toast.classList.remove('show');
+        toast.style.opacity = '0';
         setTimeout(() => {
           document.body.removeChild(toast);
+          toastCount--;
+          // Adjust positions of remaining toasts
+          const remainingToasts = document.querySelectorAll('.toast');
+          remainingToasts.forEach((t, index) => {
+            t.style.top = `${20 + index * (toastHeight + 12)}px`;
+          });
         }, 300);
       }, 3000);
     }
