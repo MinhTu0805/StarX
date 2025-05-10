@@ -3,19 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Luau Obfuscator - UltraSec with Gemini AI</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>Luau Obfuscator - UltraSec with Mint AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-dark.min.css" rel="stylesheet">
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Inter', sans-serif;
     }
 
     body {
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      background: linear-gradient(135deg, #1e3c72, #6b7280, #1e3c72);
+      background-size: 200% 200%;
+      animation: gradientFlow 15s ease infinite;
       color: #e2e8f0;
       display: flex;
       flex-direction: column;
@@ -23,17 +25,56 @@
       justify-content: center;
       min-height: 100vh;
       padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, rgba(99, 179, 237, 0.15) 0%, transparent 70%);
+      z-index: -1;
     }
 
     .container {
       max-width: 900px;
       width: 100%;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
       border-radius: 16px;
       padding: 32px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(99, 179, 237, 0.1) 0%, transparent 70%);
+      animation: pulse 10s infinite;
+      z-index: -1;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.2; }
+      50% { transform: scale(1.2); opacity: 0.4; }
+      100% { transform: scale(1); opacity: 0.2; }
     }
 
     h1 {
@@ -42,7 +83,17 @@
       margin-bottom: 24px;
       font-size: 2.8rem;
       font-weight: 700;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(90deg, #63b3ed, #ffffff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: textGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes textGlow {
+      0%, 100% { filter: drop-shadow(0 0 8px rgba(99, 179, 237, 0.5)); }
+      50% { filter: drop-shadow(0 0 12px rgba(99, 179, 237, 0.8)); }
     }
 
     .input-group, .output-group, .deobfuscate-group {
@@ -52,19 +103,33 @@
     label {
       display: block;
       font-size: 1rem;
-      font-weight: 500;
+      font-weight: 600;
       margin-bottom: 8px;
       color: #a0aec0;
+      transition: color 0.3s;
+    }
+
+    label:hover {
+      color: #e2e8f0;
     }
 
     .code-container {
       position: relative;
       width: 100%;
-      height: 180px;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
+      height: 200px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 12px;
       overflow: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+      background-clip: padding-box;
+    }
+
+    .code-container:hover {
+      border: 1px solid transparent;
+      background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)) padding-box,
+                  linear-gradient(45deg, #3182ce, #63b3ed) border-box;
+      box-shadow: 0 0 20px rgba(99, 179, 237, 0.4);
     }
 
     textarea {
@@ -74,18 +139,20 @@
       background: transparent;
       border: none;
       color: transparent;
-      caret-color: #e2e8f0;
+      caret-color: #63b3ed;
       resize: none;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
       position: absolute;
       top: 0;
       left: 0;
       z-index: 2;
+      transition: caret-color 0.3s;
     }
 
     textarea:focus {
       outline: none;
+      caret-color: #93c5fd;
     }
 
     pre, code {
@@ -95,8 +162,8 @@
       padding: 16px;
       background: transparent;
       color: #e2e8f0;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
       overflow: auto;
       position: absolute;
       top: 0;
@@ -106,7 +173,7 @@
 
     .output-code-container pre, .output-code-container code,
     .deobfuscated-code-container pre, .deobfuscated-code-container code {
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.6);
     }
 
     .token.keyword.local {
@@ -136,19 +203,20 @@
     input[type="text"] {
       width: 100%;
       padding: 12px;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       color: #e2e8f0;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 1rem;
-      transition: border-color 0.3s, box-shadow 0.3s;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
     }
 
     input[type="text"]:focus {
       outline: none;
       border-color: #63b3ed;
-      box-shadow: 0 0 8px rgba(99, 179, 237, 0.5);
+      box-shadow: 0 0 8px rgba(99, 179, 237, 0.6);
+      background: rgba(0, 0, 0, 0.6);
     }
 
     .obfuscate-btn, .deobfuscate-btn {
@@ -163,7 +231,7 @@
       cursor: pointer;
       position: relative;
       overflow: hidden;
-      transition: transform 0.3s, box-shadow 0.3s;
+      transition: all 0.3s ease;
     }
 
     .deobfuscate-btn {
@@ -171,15 +239,15 @@
     }
 
     .obfuscate-btn:hover, .deobfuscate-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(99, 179, 237, 0.5);
+      transform: scale(1.02);
+      box-shadow: 0 4px 16px rgba(99, 179, 237, 0.6);
     }
 
     .deobfuscate-btn:hover {
-      box-shadow: 0 4px 16px rgba(229, 62, 62, 0.5);
+      box-shadow: 0 4px 16px rgba(229, 62, 62, 0.6);
     }
 
-    .obfuscate-btn::before {
+    .obfuscate-btn::before, .deobfuscate-btn::before {
       content: '';
       position: absolute;
       top: -50%;
@@ -226,24 +294,30 @@
       font-weight: 600;
       cursor: pointer;
       margin-top: 12px;
-      transition: transform 0.3s, box-shadow 0.3s;
+      transition: all 0.3s ease;
     }
 
     #copy-btn:hover, #copy-key-btn:hover, #copy-deobfuscated-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(56, 161, 105, 0.5);
+      transform: scale(1.02);
+      box-shadow: 0 4px 16px rgba(56, 161, 105, 0.6);
     }
 
     #unique-key {
       margin-top: 12px;
       padding: 10px;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       color: #63b3ed;
-      font-family: 'Courier New', Courier, monospace;
+      font-family: 'JetBrains Mono', monospace;
       font-size: 0.95rem;
       word-break: break-all;
+      transition: all 0.3s ease;
+    }
+
+    #unique-key:hover {
+      background: rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 8px rgba(99, 179, 237, 0.5);
     }
 
     #error {
@@ -251,6 +325,7 @@
       margin-top: 12px;
       font-size: 0.9rem;
       text-align: center;
+      animation: fadeIn 0.3s ease;
     }
 
     .footer {
@@ -258,6 +333,12 @@
       color: #a0aec0;
       font-size: 0.85rem;
       text-align: center;
+      animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Toast Notification Styles */
@@ -266,28 +347,39 @@
       top: 20px;
       right: 20px;
       padding: 12px 24px;
-      border-radius: 8px;
+      border-radius: 10px;
       color: white;
       font-size: 0.9rem;
       font-weight: 500;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       opacity: 0;
-      transform: translateY(-10px);
-      transition: opacity 0.3s, transform 0.3s;
+      transform: translateX(100%) scale(0.8);
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid transparent;
     }
 
     .toast.show {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateX(0) scale(1);
     }
 
     .toast.success {
       background: linear-gradient(90deg, #38a169, #68d391);
+      border: 1px solid #68d391;
     }
 
     .toast.error {
       background: linear-gradient(90deg, #c53030, #f56565);
+      border: 1px solid #f56565;
+    }
+
+    .toast svg {
+      width: 16px;
+      height: 16px;
     }
 
     @media (max-width: 600px) {
@@ -298,7 +390,10 @@
         font-size: 2rem;
       }
       .code-container {
-        height: 120px;
+        height: 150px;
+      }
+      textarea, pre, code {
+        font-size: 0.85rem;
       }
       .toast {
         top: 10px;
@@ -311,7 +406,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Luau Obfuscator - UltraSec with Gemini AI</h1>
+    <h1>Luau Obfuscator - UltraSec with Mint AI</h1>
     <!-- Obfuscation Section -->
     <div class="input-group">
       <label for="input-code">Input Luau Code</label>
@@ -352,7 +447,7 @@
     </div>
     <p id="error"></p>
     <p class="footer">
-      UltraSec with Gemini AI obfuscates Luau code with AI-powered encoding, junk code, and unique keys. Deobfuscate using the unique key. The output is executable in Roblox.
+      UltraSec with Mint AI obfuscates Luau code with AI-powered encoding, junk code, and unique keys. Deobfuscate using the unique key on the same device. The output is executable in Roblox.
     </p>
   </div>
 
@@ -384,7 +479,10 @@
     function showToast(message, type = 'success') {
       const toast = document.createElement('div');
       toast.className = `toast ${type}`;
-      toast.textContent = message;
+      const icon = type === 'success'
+        ? `<svg viewBox="0 0 24 24" fill="white"><path d="M9 16.2l-3.5-3.5L4 14.1l5 5L20 8l-1.4-1.4L9 16.2z"/></svg>`
+        : `<svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`;
+      toast.innerHTML = `${icon}${message}`;
       document.body.appendChild(toast);
 
       // Show toast
@@ -399,6 +497,26 @@
           document.body.removeChild(toast);
         }, 300);
       }, 3000);
+    }
+
+    // Typewriter Effect
+    function typewriterEffect(element, text, speed, highlightElement) {
+      element.value = '';
+      element.setAttribute('readonly', 'true');
+      let i = 0;
+
+      function type() {
+        if (i < text.length) {
+          element.value += text.charAt(i);
+          highlightElement.innerHTML = Prism.highlight(element.value, Prism.languages.lua, 'lua');
+          i++;
+          setTimeout(type, speed);
+        } else {
+          element.removeAttribute('readonly');
+        }
+      }
+
+      type();
     }
 
     function generateRandomString(length) {
@@ -429,6 +547,18 @@
 
     function generateJunkStrings(size) {
       return Array.from({ length: size }, () => `"${generateRandomString(10)}"`);
+    }
+
+    // Minify code to one line (for the obfuscated part)
+    function minifyCode(code) {
+      return code
+        .replace(/\s*(\r\n|\n|\r)\s*/gm, '') // Remove newlines
+        .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+        .replace(/;\s*/g, ';') // Remove spaces after semicolons
+        .replace(/\s*{\s*/g, '{') // Remove spaces around braces
+        .replace(/\s*}\s*/g, '}') // Remove spaces around braces
+        .replace(/\s*,\s*/g, ',') // Remove spaces around commas
+        .trim();
     }
 
     // Sync textarea and highlighted code
@@ -482,7 +612,7 @@
         const uuid = generateUUID();
         uniqueKey.textContent = `Unique Key: ${uuid}`;
 
-        // Step 1: Send code to Gemini AI
+        // Step 1: Send code to Mint AI (using Google Gemini API)
         const prompt = `
           Obfuscate the following Luau (Roblox Lua) code to make it extremely difficult to read or reverse-engineer, surpassing MoonSec V3. Use techniques like:
           - Encoding strings into complex numerical tables with dynamic decoding
@@ -513,17 +643,17 @@
         });
 
         if (!response.ok) {
-          throw new Error(`Gemini AI API error: ${response.statusText}`);
+          throw new Error(`Mint AI API error: ${response.statusText}`);
         }
 
         const data = await response.json();
-        let geminiObfuscatedCode = data.candidates[0].content.parts[0].text;
+        let mintObfuscatedCode = data.candidates[0].content.parts[0].text;
 
-        // Clean up Gemini response
-        geminiObfuscatedCode = geminiObfuscatedCode.replace(/```lua\n|```/g, '');
+        // Clean up Mint response
+        mintObfuscatedCode = mintObfuscatedCode.replace(/```lua\n|```/g, '');
 
         // Step 2: Apply local obfuscation
-        let code = geminiObfuscatedCode;
+        let code = mintObfuscatedCode;
 
         // Replace variable names
         const variableMap = {};
@@ -539,63 +669,45 @@
         // Encode strings with XOR
         code = code.replace(/"([^"]*)"/g, (match, str) => {
           const [data, key] = encodeString(str).split('},');
-          return `(function() local _d={${data}}; local _k=${key}; local _r={}; for _i,_v in ipairs(_d) do _r[_i]=bit32.bxor(_v,_k) end; return utf8.char(table.unpack(_r)) end)()`;
+          return `(function() local _d={${data}};local _k=${key};local _r={};for _i,_v in ipairs(_d)do _r[_i]=bit32.bxor(_v,_k)end;return utf8.char(table.unpack(_r))end)()`;
         });
 
         // Handle loadstring
         code = code.replace(/loadstring\(game:HttpGet\("([^"]*)"\)\)\(\)/g, (match, url) => {
           const [data, key] = encodeString(url).split('},');
-          return `(function() local _d={${data}}; local _k=${key}; local _r={}; for _i,_v in ipairs(_d) do _r[_i]=bit32.bxor(_v,_k) end; return loadstring(game:HttpGet(utf8.char(table.unpack(_r))))() end)()`;
+          return `(function() local _d={${data}};local _k=${key};local _r={};for _i,_v in ipairs(_d)do _r[_i]=bit32.bxor(_v,_k)end;return loadstring(game:HttpGet(utf8.char(table.unpack(_r))))()end)()`;
         });
 
         // Generate fake bytecode table
         const bytecodeTable = generateJunkTable(100);
-        const bytecodeDecoder = `
-local ${generateRandomString(20)} = {${bytecodeTable.join(',')}};
-local ${generateRandomString(20)} = function(_t) local _r=0; for _,_v in ipairs(_t) do _r=_r+_v end; return _r end;
-if ${generateRandomString(20)}(${generateRandomString(20)}) > 999999 then print("Never runs") end;
-`;
+        const bytecodeDecoder = `local ${generateRandomString(20)}={${bytecodeTable.join(',')}};local ${generateRandomString(20)}=function(_t)local _r=0;for _,_v in ipairs(_t)do _r=_r+_v end;return _r end;if ${generateRandomString(20)}(${generateRandomString(20)})>999999 then print("Never runs")end;`;
 
         // Add heavy junk code
         const junkTable = generateJunkTable(200);
         const junkStrings = generateJunkStrings(50);
-        const junkCode = `
-local ${generateRandomString(20)} = {${junkTable.join(',')}};
-local ${generateRandomString(20)} = {${junkStrings.join(',')}};
-local ${generateRandomString(20)} = function() for _,${generateRandomString(15)} in pairs(${generateRandomString(20)}) do
-  if math.random() > 2 then print(${generateRandomString(20)}[1]) end
-end end; ${generateRandomString(20)}();
-`;
+        const junkCode = `local ${generateRandomString(20)}={${junkTable.join(',')}};local ${generateRandomString(20)}={${junkStrings.join(',')}};local ${generateRandomString(20)}=function()for _,${generateRandomString(15)} in pairs(${generateRandomString(20)})do if math.random()>2 then print(${generateRandomString(20)}[1])end end end;${generateRandomString(20)}();`;
 
         // Anti-debug check
-        const antiDebug = `
-local ${generateRandomString(20)} = function() if _G.__DEBUG__ then while true do end end end;
-${generateRandomString(20)}();
-`;
+        const antiDebug = `local ${generateRandomString(20)}=function()if _G.__DEBUG__ then while true do end end end;${generateRandomString(20)}();`;
 
-        // Add app name in comment (no UUID)
-        code = `
--- Obfuscated with UltraSec
-(function(...)
-  ${bytecodeDecoder}
-  ${junkCode}
-  ${antiDebug}
-  local ${generateRandomString(20)} = function(...)
-    local ${generateRandomString(20)} = function(...) ${code} end;
-    return ${generateRandomString(20)}(...);
-  end;
-  return (function(...) local _=${generateRandomString(20)}; return _(...) end)(...);
-end)(...)
-`;
+        // Combine code
+        code = `(function(...) ${bytecodeDecoder} ${junkCode} ${antiDebug} local ${generateRandomString(20)}=function(...) local ${generateRandomString(20)}=function(...) ${code} end;return ${generateRandomString(20)}(...);end;return (function(...) local _=${generateRandomString(20)};return _(...)end)(...);end)(...)`;
+
+        // Minify the obfuscated code part
+        const minifiedCode = minifyCode(code);
+
+        // Format output as two lines
+        const finalCode = `-- Obfuscated with UltraSec\n${minifiedCode}`;
 
         // Store in localStorage
-        const codeMap = JSON.parse(localStorage.getItem('ultraSecCodeMap') || '{}');
-        codeMap[uuid] = { original: inputCode.value, obfuscated: code };
-        localStorage.setItem('ultraSecCodeMap', JSON.stringify(codeMap));
+        localStorage.setItem(uuid, JSON.stringify({
+          original: inputCode.value,
+          obfuscated: finalCode
+        }));
 
-        outputCode.value = code;
-        outputHighlight.innerHTML = Prism.highlight(code, Prism.languages.lua, 'lua');
+        // Apply typewriter effect
         outputGroup.style.display = 'block';
+        typewriterEffect(outputCode, finalCode, 10, outputHighlight);
         error.textContent = '';
         showToast('Code obfuscated successfully!', 'success');
       } catch (e) {
@@ -627,16 +739,16 @@ end)(...)
       deobfuscateBtn.disabled = true;
 
       try {
-        const codeMap = JSON.parse(localStorage.getItem('ultraSecCodeMap') || '{}');
-        const storedCode = codeMap[deobfuscateKey];
-
-        if (!storedCode) {
+        const storedData = localStorage.getItem(deobfuscateKey);
+        if (!storedData) {
           throw new Error('Invalid or unknown unique key!');
         }
 
-        deobfuscatedCode.value = storedCode.original;
-        deobfuscatedHighlight.innerHTML = Prism.highlight(storedCode.original, Prism.languages.lua, 'lua');
+        const storedCode = JSON.parse(storedData);
+
+        // Apply typewriter effect
         deobfuscatedGroup.style.display = 'block';
+        typewriterEffect(deobfuscatedCode, storedCode.original, 10, deobfuscatedHighlight);
         error.textContent = '';
         showToast('Code deobfuscated successfully!', 'success');
       } catch (e) {
