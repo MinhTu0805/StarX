@@ -3,21 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Luau Obfuscator - UltraSec with Mint AI</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <title>Luau Obfuscator - MintSec with Mint AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-dark.min.css" rel="stylesheet">
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Poppins', sans-serif;
     }
 
     body {
-      background: linear-gradient(135deg, #1e3c72, #6b7280, #1e3c72);
-      background-size: 200% 200%;
-      animation: gradientFlow 15s ease infinite;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       color: #e2e8f0;
       display: flex;
       flex-direction: column;
@@ -25,56 +23,17 @@
       justify-content: center;
       min-height: 100vh;
       padding: 20px;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    @keyframes gradientFlow {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    body::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 50% 50%, rgba(99, 179, 237, 0.15) 0%, transparent 70%);
-      z-index: -1;
     }
 
     .container {
       max-width: 900px;
       width: 100%;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
       border-radius: 16px;
       padding: 32px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .container::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(99, 179, 237, 0.1) 0%, transparent 70%);
-      animation: pulse 10s infinite;
-      z-index: -1;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 0.2; }
-      50% { transform: scale(1.2); opacity: 0.4; }
-      100% { transform: scale(1); opacity: 0.2; }
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     h1 {
@@ -83,17 +42,7 @@
       margin-bottom: 24px;
       font-size: 2.8rem;
       font-weight: 700;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-      background: linear-gradient(90deg, #63b3ed, #ffffff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      animation: textGlow 2s ease-in-out infinite;
-    }
-
-    @keyframes textGlow {
-      0%, 100% { filter: drop-shadow(0 0 8px rgba(99, 179, 237, 0.5)); }
-      50% { filter: drop-shadow(0 0 12px rgba(99, 179, 237, 0.8)); }
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     .input-group, .output-group, .deobfuscate-group {
@@ -103,33 +52,19 @@
     label {
       display: block;
       font-size: 1rem;
-      font-weight: 600;
+      font-weight: 500;
       margin-bottom: 8px;
       color: #a0aec0;
-      transition: color 0.3s;
-    }
-
-    label:hover {
-      color: #e2e8f0;
     }
 
     .code-container {
       position: relative;
       width: 100%;
-      height: 200px;
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 12px;
+      height: 180px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
       overflow: hidden;
-      transition: all 0.3s ease;
-      border: 1px solid transparent;
-      background-clip: padding-box;
-    }
-
-    .code-container:hover {
-      border: 1px solid transparent;
-      background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)) padding-box,
-                  linear-gradient(45deg, #3182ce, #63b3ed) border-box;
-      box-shadow: 0 0 20px rgba(99, 179, 237, 0.4);
     }
 
     textarea {
@@ -139,20 +74,18 @@
       background: transparent;
       border: none;
       color: transparent;
-      caret-color: #63b3ed;
+      caret-color: #e2e8f0;
       resize: none;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.95rem;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1rem;
       position: absolute;
       top: 0;
       left: 0;
       z-index: 2;
-      transition: caret-color 0.3s;
     }
 
     textarea:focus {
       outline: none;
-      caret-color: #93c5fd;
     }
 
     pre, code {
@@ -162,8 +95,8 @@
       padding: 16px;
       background: transparent;
       color: #e2e8f0;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.95rem;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1rem;
       overflow: auto;
       position: absolute;
       top: 0;
@@ -173,7 +106,7 @@
 
     .output-code-container pre, .output-code-container code,
     .deobfuscated-code-container pre, .deobfuscated-code-container code {
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.4);
     }
 
     .token.keyword.local {
@@ -203,20 +136,19 @@
     input[type="text"] {
       width: 100%;
       padding: 12px;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.3);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       color: #e2e8f0;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
 
     input[type="text"]:focus {
       outline: none;
       border-color: #63b3ed;
-      box-shadow: 0 0 8px rgba(99, 179, 237, 0.6);
-      background: rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 8px rgba(99, 179, 237, 0.5);
     }
 
     .obfuscate-btn, .deobfuscate-btn {
@@ -231,7 +163,7 @@
       cursor: pointer;
       position: relative;
       overflow: hidden;
-      transition: all 0.3s ease;
+      transition: transform 0.3s, box-shadow 0.3s;
     }
 
     .deobfuscate-btn {
@@ -239,15 +171,27 @@
     }
 
     .obfuscate-btn:hover, .deobfuscate-btn:hover {
-      transform: scale(1.02);
-      box-shadow: 0 4px 16px rgba(99, 179, 237, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(99, 179, 237, 0.5);
     }
 
     .deobfuscate-btn:hover {
-      box-shadow: 0 4px 16px rgba(229, 62, 62, 0.6);
+      box-shadow: 0 4px 16px rgba(229, 62, 62, 0.5);
     }
 
-    .obfuscate-btn::before, .deobfuscate-btn::before {
+    .deobfuscate-btn::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+      transform: rotate(45deg);
+      animation: sparkle 2s infinite;
+    }
+
+    .obfuscate-btn::before {
       content: '';
       position: absolute;
       top: -50%;
@@ -294,30 +238,24 @@
       font-weight: 600;
       cursor: pointer;
       margin-top: 12px;
-      transition: all 0.3s ease;
+      transition: transform 0.3s, box-shadow 0.3s;
     }
 
     #copy-btn:hover, #copy-key-btn:hover, #copy-deobfuscated-btn:hover {
-      transform: scale(1.02);
-      box-shadow: 0 4px 16px rgba(56, 161, 105, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(56, 161, 105, 0.5);
     }
 
     #unique-key {
       margin-top: 12px;
       padding: 10px;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.3);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       color: #63b3ed;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'Courier New', Courier, monospace;
       font-size: 0.95rem;
       word-break: break-all;
-      transition: all 0.3s ease;
-    }
-
-    #unique-key:hover {
-      background: rgba(0, 0, 0, 0.6);
-      box-shadow: 0 0 8px rgba(99, 179, 237, 0.5);
     }
 
     #error {
@@ -325,7 +263,6 @@
       margin-top: 12px;
       font-size: 0.9rem;
       text-align: center;
-      animation: fadeIn 0.3s ease;
     }
 
     .footer {
@@ -333,52 +270,36 @@
       color: #a0aec0;
       font-size: 0.85rem;
       text-align: center;
-      animation: fadeIn 1s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Toast Notification Styles */
     .toast {
       position: fixed;
+      top: 20px;
       right: 20px;
       padding: 12px 24px;
-      border-radius: 10px;
+      border-radius: 8px;
       color: white;
       font-size: 0.9rem;
       font-weight: 500;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       opacity: 0;
-      transform: translateX(100%) scale(0.8);
-      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transform: translateY(-10px);
+      transition: opacity 0.3s, transform 0.3s;
       z-index: 1000;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid transparent;
     }
 
     .toast.show {
       opacity: 1;
-      transform: translateX(0) scale(1);
+      transform: translateY(0);
     }
 
     .toast.success {
       background: linear-gradient(90deg, #38a169, #68d391);
-      border: 1px solid #68d391;
     }
 
     .toast.error {
       background: linear-gradient(90deg, #c53030, #f56565);
-      border: 1px solid #f56565;
-    }
-
-    .toast svg {
-      width: 16px;
-      height: 16px;
     }
 
     @media (max-width: 600px) {
@@ -389,12 +310,10 @@
         font-size: 2rem;
       }
       .code-container {
-        height: 150px;
-      }
-      textarea, pre, code {
-        font-size: 0.85rem;
+        height: 120px;
       }
       .toast {
+        top: 10px;
         right: 10px;
         font-size: 0.8rem;
         padding: 10px 20px;
@@ -404,7 +323,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Luau Obfuscator - UltraSec with Mint AI</h1>
+    <h1>Luau Obfuscator - MintSec.V3 with Mint AI</h1>
     <!-- Obfuscation Section -->
     <div class="input-group">
       <label for="input-code">Input Luau Code</label>
@@ -445,7 +364,7 @@
     </div>
     <p id="error"></p>
     <p class="footer">
-      UltraSec with Mint AI obfuscates Luau code with AI-powered encoding, junk code, and unique keys. Deobfuscate using the unique key on the same device. The output is executable in Roblox.
+      MintSec.V3 with Mint AI obfuscates Luau code with AI-powered encoding, junk code, and unique keys. Deobfuscate using the unique key. The output is executable in Roblox.
     </p>
   </div>
 
@@ -470,58 +389,28 @@
       'punctuation': /[(){}\[\],;]/
     };
 
+    const API_KEY = "AIzaSyAGXTME-OHwEA5WDl2ms3Uw31gGLJxwcnE";
+    const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent";
+
     // Toast Notification Function
-    let toastCount = 0;
     function showToast(message, type = 'success') {
       const toast = document.createElement('div');
       toast.className = `toast ${type}`;
-      const icon = type === 'success'
-        ? `<svg viewBox="0 0 24 24" fill="white"><path d="M9 16.2l-3.5-3.5L4 14.1l5 5L20 8l-1.4-1.4L9 16.2z"/></svg>`
-        : `<svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`;
-      toast.innerHTML = `${icon}${message}`;
+      toast.textContent = message;
       document.body.appendChild(toast);
 
-      toastCount++;
-      const toastHeight = 44;
-      const topPosition = 20 + (toastCount - 1) * (toastHeight + 12);
-      toast.style.top = `${topPosition}px`;
-
+      // Show toast
       setTimeout(() => {
         toast.classList.add('show');
       }, 100);
 
+      // Hide toast after 3 seconds
       setTimeout(() => {
         toast.classList.remove('show');
-        toast.style.opacity = '0';
         setTimeout(() => {
           document.body.removeChild(toast);
-          toastCount--;
-          const remainingToasts = document.querySelectorAll('.toast');
-          remainingToasts.forEach((t, index) => {
-            t.style.top = `${20 + index * (toastHeight + 12)}px`;
-          });
         }, 300);
       }, 3000);
-    }
-
-    // Typewriter Effect
-    function typewriterEffect(element, text, speed, highlightElement) {
-      element.value = '';
-      element.setAttribute('readonly', 'true');
-      let i = 0;
-
-      function type() {
-        if (i < text.length) {
-          element.value += text.charAt(i);
-          highlightElement.innerHTML = Prism.highlight(element.value, Prism.languages.lua, 'lua');
-          i++;
-          setTimeout(type, speed);
-        } else {
-          element.removeAttribute('readonly');
-        }
-      }
-
-      type();
     }
 
     function generateRandomString(length) {
@@ -540,125 +429,18 @@
       });
     }
 
-    // MoonSec-style string encoding (based on v7)
-    function encodeStringMoonSec(str, key) {
-      const result = [];
-      for (let i = 0; i < str.length; i++) {
-        const charCode = str.charCodeAt(i) ^ key.charCodeAt(i % key.length);
-        result.push(charCode % 256);
-      }
-      return `{${result.join(',')}},${key}`;
+    function encodeString(str) {
+      const key = Math.floor(Math.random() * 255) + 1;
+      const encoded = Array.from(btoa(str).replace(/=/g, '')).map(c => c.charCodeAt(0) ^ key);
+      return `{${encoded.join(',')}},${key}`;
     }
 
-    // Simple Luau parser to generate bytecode
-    function generateBytecode(code) {
-      const instructions = [];
-      const constants = [];
-      const strings = [];
-      const key = generateRandomString(8);
-
-      // Tokenize code (simplified)
-      const tokens = code.match(/(\b(?:local|function|end|if|then|else|while|do|for|in|return)\b|[a-zA-Z_][a-zA-Z0-9_]*|".*?"|\d+\.?\d*|[+\-*/%=<>!]+|[(){},;])/g) || [];
-
-      // Map variables to random names
-      const variableMap = {};
-      const reserved = ['local', 'function', 'end', 'if', 'then', 'else', 'while', 'do', 'for', 'in', 'return', 'utf8', 'table', 'unpack', 'math', 'print', 'bit32', 'game', 'HttpGet', 'loadstring'];
-      tokens.forEach((token, i) => {
-        if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(token) && !reserved.includes(token)) {
-          if (!variableMap[token]) {
-            variableMap[token] = generateRandomString(20);
-          }
-          tokens[i] = variableMap[token];
-        }
-      });
-
-      // Process tokens into instructions
-      let pc = 0;
-      let constIndex = 0;
-      let stringIndex = 0;
-
-      for (let i = 0; i < tokens.length; i++) {
-        const token = tokens[i];
-        if (/^\d+\.?\d*$/.test(token)) {
-          constants.push(parseFloat(token));
-          instructions.push([0, constIndex++]); // LOADCONST
-          pc++;
-        } else if (token.startsWith('"') && token.endsWith('"')) {
-          const str = token.slice(1, -1);
-          const [data, keyStr] = encodeStringMoonSec(str, key).split('},');
-          strings.push({ data, key: keyStr });
-          instructions.push([1, stringIndex++]); // LOADSTRING
-          pc++;
-        } else if (token === 'local') {
-          const varName = tokens[++i];
-          instructions.push([2, variableMap[varName] || varName]); // SETLOCAL
-          pc++;
-        } else if (token === 'function') {
-          const funcName = tokens[++i];
-          instructions.push([3, variableMap[funcName] || funcName]); // DEFFUNC
-          pc++;
-        } else if (token === '=') {
-          const varName = tokens[i - 1];
-          instructions.push([4, variableMap[varName] || varName]); // SETVAR
-          pc++;
-        } else if (token === 'return') {
-          instructions.push([5]); // RETURN
-          pc++;
-        } else if (token === '+') {
-          instructions.push([6]); // ADD
-          pc++;
-        } else if (token === '-') {
-          instructions.push([7]); // SUB
-          pc++;
-        } else if (token === '*') {
-          instructions.push([8]); // MUL
-          pc++;
-        } else if (token === '/') {
-          instructions.push([9]); // DIV
-          pc++;
-        } else if (token === 'if') {
-          instructions.push([10, pc + 2]); // JMP_IF
-          pc++;
-        } else if (token === 'then') {
-          instructions.push([11]); // THEN
-          pc++;
-        } else if (token === 'end') {
-          instructions.push([12]); // END
-          pc++;
-        } else if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(token)) {
-          instructions.push([13, variableMap[token] || token]); // LOADVAR
-          pc++;
-        }
-      }
-
-      return { instructions, constants, strings, key };
-    }
-
-    // Generate fake bytecode table
-    function generateFakeBytecode(size) {
-      return Array.from({ length: size }, () => Math.floor(Math.random() * 65536));
-    }
-
-    // Generate junk table
     function generateJunkTable(size) {
       return Array.from({ length: size }, () => Math.floor(Math.random() * 10000));
     }
 
-    // Generate junk strings
     function generateJunkStrings(size) {
       return Array.from({ length: size }, () => `"${generateRandomString(10)}"`);
-    }
-
-    // Minify code to one line
-    function minifyCode(code) {
-      return code
-        .replace(/\s*(\r\n|\n|\r)\s*/gm, '')
-        .replace(/\s+/g, ' ')
-        .replace(/;\s*/g, ';')
-        .replace(/\s*{\s*/g, '{')
-        .replace(/\s*}\s*/g, '}')
-        .replace(/\s*,\s*/g, ',')
-        .trim();
     }
 
     // Sync textarea and highlighted code
@@ -712,167 +494,120 @@
         const uuid = generateUUID();
         uniqueKey.textContent = `Unique Key: ${uuid}`;
 
-        // Generate bytecode
-        const { instructions, constants, strings, key } = generateBytecode(inputCode.value);
+        // Step 1: Send code to Gemini AI
+        const prompt = `
+          Obfuscate the following Luau (Roblox Lua) code to make it extremely difficult to read or reverse-engineer, surpassing MoonSec V3. Use techniques like:
+          - Encoding strings into complex numerical tables with dynamic decoding
+          - Renaming variables to long, random strings
+          - Adding heavy junk code (useless loops, large tables, dummy functions)
+          - Wrapping code in multiple self-executing functions
+          - Supporting loadstring(game:HttpGet("link")) by encoding URLs
+          - Adding anti-debug checks
+          Ensure the code remains executable in Roblox. Here is the code to obfuscate:
 
-        // Generate VM code (mimic MoonSec v23)
-        const vmCode = `
-          local ${generateRandomString(20)}={${instructions.map(([op, ...args]) => `{${op},${args.join(',')}}`).join(',')}};
-          local ${generateRandomString(20)}={${constants.join(',')}};
-          local ${generateRandomString(20)}={${strings.map(s => `{${s.data}}`).join(',')}};
-          local ${generateRandomString(20)}="${key}";
-          local ${generateRandomString(20)}={};
-          local ${generateRandomString(20)}={};
-          local ${generateRandomString(20)}=0;
-          local ${generateRandomString(20)}=function(...)
-            local ${generateRandomString(20)}={...};
-            local ${generateRandomString(20)}={};
-            local ${generateRandomString(20)}=0;
-            while true do
-              if ${generateRandomString(20)}>=#${generateRandomString(20)} then break end
-              ${generateRandomString(20)}=${generateRandomString(20)}+1;
-              local ${generateRandomString(20)}=${generateRandomString(20)}[${generateRandomString(20)}];
-              local ${generateRandomString(20)}=${generateRandomString(20)}[1];
-              if ${generateRandomString(20)}==0 then -- LOADCONST
-                ${generateRandomString(20)}[${generateRandomString(20)}]=${generateRandomString(20)}[${generateRandomString(20)}[2]+1];
-              elseif ${generateRandomString(20)}==1 then -- LOADSTRING
-                local ${generateRandomString(20)}=${generateRandomString(20)}[${generateRandomString(20)}[2]+1];
-                local ${generateRandomString(20)}={};
-                for ${generateRandomString(20)}=1,#${generateRandomString(20)} do
-                  ${generateRandomString(20)}[${generateRandomString(20)}]=bit32.bxor(${generateRandomString(20)}[${generateRandomString(20)}],utf8.codepoint(${generateRandomString(20)},1+(${generateRandomString(20)}-1)%#${generateRandomString(20)},1+(${generateRandomString(20)}-1)%#${generateRandomString(20)}))%256;
-                end
-                ${generateRandomString(20)}[${generateRandomString(20)}]=utf8.char(table.unpack(${generateRandomString(20)}));
-              elseif ${generateRandomString(20)}==2 then -- SETLOCAL
-                ${generateRandomString(20)}[${generateRandomString(20)}[2]]=${generateRandomString(20)}[${generateRandomString(20)}];
-              elseif ${generateRandomString(20)}==3 then -- DEFFUNC
-                ${generateRandomString(20)}[${generateRandomString(20)}[2]]=function(...) return ${generateRandomString(20)}(...) end;
-              elseif ${generateRandomString(20)}==4 then -- SETVAR
-                ${generateRandomString(20)}[${generateRandomString(20)}[2]]=${generateRandomString(20)}[${generateRandomString(20)}];
-              elseif ${generateRandomString(20)}==5 then -- RETURN
-                return ${generateRandomString(20)}[${generateRandomString(20)}];
-              elseif ${generateRandomString(20)}==6 then -- ADD
-                ${generateRandomString(20)}[${generateRandomString(20)}]=${generateRandomString(20)}[${generateRandomString(20)}]+${generateRandomString(20)}[${generateRandomString(20)}-1];
-              elseif ${generateRandomString(20)}==7 then -- SUB
-                ${generateRandomString(20)}[${generateRandomString(20)}]=${generateRandomString(20)}[${generateRandomString(20)}]-${generateRandomString(20)}[${generateRandomString(20)}-1];
-              elseif ${generateRandomString(20)}==8 then -- MUL
-                ${generateRandomString(20)}[${generateRandomString(20)}]=${generateRandomString(20)}[${generateRandomString(20)}]*${generateRandomString(20)}[${generateRandomString(20)}-1];
-              elseif ${generateRandomString(20)}==9 then -- DIV
-                ${generateRandomString(20)}[${generateRandomString(20)}]=${generateRandomString(20)}[${generateRandomString(20)}]/${generateRandomString(20)}[${generateRandomString(20)}-1];
-              elseif ${generateRandomString(20)}==10 then -- JMP_IF
-                if ${generateRandomString(20)}[${generateRandomString(20)}] then ${generateRandomString(20)}=${generateRandomString(20)}[2] end
-              elseif ${generateRandomString(20)}==11 then -- THEN
-                ${generateRandomString(20)}=${generateRandomString(20)}+1;
-              elseif ${generateRandomString(20)}==12 then -- END
-                ${generateRandomString(20)}=${generateRandomString(20)}+1;
-              elseif ${generateRandomString(20)}==13 then -- LOADVAR
-                ${generateRandomString(20)}[${generateRandomString(20)}]=${generateRandomString(20)}[${generateRandomString(20)}[2]];
-              end
-              ${generateRandomString(20)}=${generateRandomString(20)}+1;
-            end
-            return ${generateRandomString(20)}[${generateRandomString(20)}];
-          end;
-          return ${generateRandomString(20)}(...);
+          \`\`\`lua
+          ${inputCode.value}
+          \`\`\`
+
+          Return only the obfuscated code as plain text.
         `;
 
-        // Generate fake bytecode table
-        const fakeBytecode = generateFakeBytecode(200);
-        const fakeBytecodeCode = `
-          local ${generateRandomString(20)}={${fakeBytecode.join(',')}};
-          local ${generateRandomString(20)}=function(_t)
-            local _r=0;local _s=0;
-            while _s<20 do
-              _s=_s+1;
-              for _,_v in ipairs(_t) do _r=_r+_v end
-            end
-            return _r
-          end;
-          if ${generateRandomString(20)}(${generateRandomString(20)})>9999999 then print("Never runs") end;
-        `;
+        const response = await fetch(API_URL + `?key=${API_KEY}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: prompt }]
+            }]
+          })
+        });
 
-        // Generate junk code
-        const junkTable = generateJunkTable(300);
-        const junkStrings = generateJunkStrings(100);
-        const junkCode = `
-          local ${generateRandomString(20)}={${junkTable.join(',')}};
-          local ${generateRandomString(20)}={${junkStrings.join(',')}};
-          local ${generateRandomString(20)}=function()
-            local _s=0;
-            while _s<10 do
-              _s=_s+1;
-              for _,${generateRandomString(15)} in pairs(${generateRandomString(20)}) do
-                if math.random()>2 then print(${generateRandomString(20)}[1]) end
-              end
-            end
-          end;
-          ${generateRandomString(20)}();
-        `;
+        if (!response.ok) {
+          throw new Error(`Gemini AI API error: ${response.statusText}`);
+        }
 
-        // Anti-debug check
-        const antiDebug = `
-          local ${generateRandomString(20)}=function()
-            local _s=0;
-            while true do
-              _s=_s+1;
-              if _s>50 then
-                if _G.__DEBUG__ or debug or pcall(function() return debug.getinfo(1) end) then
-                  while true do end
-                end
-                break
-              end
-            end
-          end;
-          ${generateRandomString(20)}();
-        `;
+        const data = await response.json();
+        let geminiObfuscatedCode = data.candidates[0].content.parts[0].text;
 
-        // Complex control flow
-        const controlFlow = `
-          local ${generateRandomString(20)}=0;
-          local ${generateRandomString(20)}=function(...)
-            local _r=nil;
-            while true do
-              if ${generateRandomString(20)}==0 then
-                _r=(function(...) ${vmCode} end)(...);
-                ${generateRandomString(20)}=1
-              elseif ${generateRandomString(20)}==1 then
-                break
-              end
-            end
-            return _r
-          end;
-        `;
+        // Clean up Gemini response
+        geminiObfuscatedCode = geminiObfuscatedCode.replace(/```lua\n|```/g, '');
 
-        // Combine code
-        let code = `
-          (function(...)
-            ${fakeBytecodeCode}
-            ${junkCode}
-            ${antiDebug}
-            ${controlFlow}
-            return ${generateRandomString(20)}(...)
-          end)(...)
-        `;
+        // Step 2: Apply local obfuscation
+        let code = geminiObfuscatedCode;
+
+        // Replace variable names
+        const variableMap = {};
+        code = code.replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\b/g, (match) => {
+          const reserved = ['local', 'function', 'end', 'if', 'then', 'else', 'while', 'do', 'for', 'in', 'return', 'utf8', 'table', 'unpack', 'math', 'print', 'bit32'];
+          if (reserved.includes(match)) return match;
+          if (!variableMap[match]) {
+            variableMap[match] = generateRandomString(20);
+          }
+          return variableMap[match];
+        });
+
+        // Encode strings with XOR
+        code = code.replace(/"([^"]*)"/g, (match, str) => {
+          const [data, key] = encodeString(str).split('},');
+          return `(function() local _d={${data}}; local _k=${key}; local _r={}; for _i,_v in ipairs(_d) do _r[_i]=bit32.bxor(_v,_k) end; return utf8.char(table.unpack(_r)) end)()`;
+        });
 
         // Handle loadstring
         code = code.replace(/loadstring\(game:HttpGet\("([^"]*)"\)\)\(\)/g, (match, url) => {
-          const [data, keyStr] = encodeStringMoonSec(url, key).split('},');
-          return `(function() local _d={${data}};local _k="${keyStr}";local _r={};for _i=1,#_d do _r[_i]=bit32.bxor(_d[_i],utf8.codepoint(_k,1+((_i-1)%#_k),1+((_i-1)%#_k)))%256 end;return loadstring(game:HttpGet(utf8.char(table.unpack(_r))))()end)()`;
+          const [data, key] = encodeString(url).split('},');
+          return `(function() local _d={${data}}; local _k=${key}; local _r={}; for _i,_v in ipairs(_d) do _r[_i]=bit32.bxor(_v,_k) end; return loadstring(game:HttpGet(utf8.char(table.unpack(_r))))() end)()`;
         });
 
-        // Minify the obfuscated code
-        const minifiedCode = minifyCode(code);
+        // Generate fake bytecode table
+        const bytecodeTable = generateJunkTable(100);
+        const bytecodeDecoder = `
+local ${generateRandomString(20)} = {${bytecodeTable.join(',')}};
+local ${generateRandomString(20)} = function(_t) local _r=0; for _,_v in ipairs(_t) do _r=_r+_v end; return _r end;
+if ${generateRandomString(20)}(${generateRandomString(20)}) > 999999 then print("Never runs") end;
+`;
 
-        // Format output
-        const finalCode = `-- Obfuscated with UltraSec\n${minifiedCode}`;
+        // Add heavy junk code
+        const junkTable = generateJunkTable(200);
+        const junkStrings = generateJunkStrings(50);
+        const junkCode = `
+local ${generateRandomString(20)} = {${junkTable.join(',')}};
+local ${generateRandomString(20)} = {${junkStrings.join(',')}};
+local ${generateRandomString(20)} = function() for _,${generateRandomString(15)} in pairs(${generateRandomString(20)}) do
+  if math.random() > 2 then print(${generateRandomString(20)}[1]) end
+end end; ${generateRandomString(20)}();
+`;
+
+        // Anti-debug check
+        const antiDebug = `
+local ${generateRandomString(20)} = function() if _G.__DEBUG__ then while true do end end end;
+${generateRandomString(20)}();
+`;
+
+        // Add app name in comment (no UUID)
+        code = `
+-- Obfuscated with MintSec.V3
+(function(...)
+  ${bytecodeDecoder}
+  ${junkCode}
+  ${antiDebug}
+  local ${generateRandomString(20)} = function(...)
+    local ${generateRandomString(20)} = function(...) ${code} end;
+    return ${generateRandomString(20)}(...);
+  end;
+  return (function(...) local _=${generateRandomString(20)}; return _(...) end)(...);
+end)(...)
+`;
 
         // Store in localStorage
-        localStorage.setItem(uuid, JSON.stringify({
-          original: inputCode.value,
-          obfuscated: finalCode
-        }));
+        const codeMap = JSON.parse(localStorage.getItem('ultraSecCodeMap') || '{}');
+        codeMap[uuid] = { original: inputCode.value, obfuscated: code };
+        localStorage.setItem('ultraSecCodeMap', JSON.stringify(codeMap));
 
-        // Apply typewriter effect
+        outputCode.value = code;
+        outputHighlight.innerHTML = Prism.highlight(code, Prism.languages.lua, 'lua');
         outputGroup.style.display = 'block';
-        typewriterEffect(outputCode, finalCode, 10, outputHighlight);
         error.textContent = '';
         showToast('Code obfuscated successfully!', 'success');
       } catch (e) {
@@ -904,16 +639,16 @@
       deobfuscateBtn.disabled = true;
 
       try {
-        const storedData = localStorage.getItem(deobfuscateKey);
-        if (!storedData) {
+        const codeMap = JSON.parse(localStorage.getItem('ultraSecCodeMap') || '{}');
+        const storedCode = codeMap[deobfuscateKey];
+
+        if (!storedCode) {
           throw new Error('Invalid or unknown unique key!');
         }
 
-        const storedCode = JSON.parse(storedData);
-
-        // Apply typewriter effect
+        deobfuscatedCode.value = storedCode.original;
+        deobfuscatedHighlight.innerHTML = Prism.highlight(storedCode.original, Prism.languages.lua, 'lua');
         deobfuscatedGroup.style.display = 'block';
-        typewriterEffect(deobfuscatedCode, storedCode.original, 10, deobfuscatedHighlight);
         error.textContent = '';
         showToast('Code deobfuscated successfully!', 'success');
       } catch (e) {
@@ -934,10 +669,12 @@
 
     function copyKeyToClipboard() {
       const uniqueKey = document.getElementById('unique-key').textContent.replace('Unique Key: ', '');
+      // Try modern Clipboard API first
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(uniqueKey)
           .then(() => showToast('Unique key copied!', 'success'))
           .catch(() => {
+            // Fallback to document.execCommand
             const tempInput = document.createElement('textarea');
             tempInput.value = uniqueKey;
             document.body.appendChild(tempInput);
@@ -947,6 +684,7 @@
             showToast('Unique key copied (fallback)!', 'success');
           });
       } else {
+        // Fallback for older browsers
         const tempInput = document.createElement('textarea');
         tempInput.value = uniqueKey;
         document.body.appendChild(tempInput);
