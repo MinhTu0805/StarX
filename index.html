@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mint X Value</title>
+    <!-- Thêm các thư viện cần thiết -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         :root {
             --primary-color: #4285F4;
@@ -332,7 +335,12 @@
             font-weight: 600;
         }
         
-        .copy-btn {
+        .code-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .code-btn {
             background: none;
             border: none;
             color: #586069;
@@ -342,13 +350,27 @@
             border-radius: 4px;
         }
         
-        .copy-btn:hover {
+        .code-btn:hover {
             background-color: #e1e4e8;
         }
         
         .code-content {
             padding: 12px;
             overflow-x: auto;
+        }
+        
+        .code-preview {
+            display: none;
+            padding: 12px;
+            border-top: 1px solid #e0e0e0;
+            background-color: white;
+        }
+        
+        .file-preview {
+            margin-top: 10px;
+            border-radius: 8px;
+            max-width: 100%;
+            max-height: 200px;
         }
         
         @media (max-width: 768px) {
@@ -386,7 +408,7 @@
         
         .input-box {
             width: 100%;
-            padding: 12px 50px 12px 16px;
+            padding: 12px 100px 12px 16px;
             border: 1px solid #dadce0;
             border-radius: 12px;
             resize: none;
@@ -406,10 +428,37 @@
             box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
         }
         
-        .send-btn {
+        .input-actions {
             position: absolute;
             right: 12px;
             bottom: 12px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .upload-btn {
+            background-color: #f1f3f4;
+            color: #5f6368;
+            border: none;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .upload-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .upload-btn input {
+            display: none;
+        }
+        
+        .send-btn {
             background-color: var(--primary-color);
             color: white;
             border: none;
@@ -650,6 +699,19 @@
             from, to { border-color: transparent; }
             50% { border-color: var(--primary-color); }
         }
+
+        /* Markdown styles */
+        .message-content strong {
+            font-weight: 600;
+        }
+        
+        .message-content em {
+            font-style: italic;
+        }
+        
+        .message-content u {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -769,12 +831,20 @@
         <div class="input-area">
             <div class="input-container">
                 <textarea class="input-box" id="messageInput" placeholder="Nhập tin nhắn của bạn..." rows="1"></textarea>
-                <button class="send-btn" id="sendBtn" disabled>
-                    <div class="spinner" id="sendSpinner"></div>
-                    <svg id="sendIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                    </svg>
-                </button>
+                <div class="input-actions">
+                    <label class="upload-btn" title="Tải lên tài liệu">
+                        <input type="file" id="fileUpload" accept=".txt,.pdf,.jpg,.png,.jpeg,.ppt,.pptx" style="display: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+                        </svg>
+                    </label>
+                    <button class="send-btn" id="sendBtn" disabled>
+                        <div class="spinner" id="sendSpinner"></div>
+                        <svg id="sendIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
         
@@ -791,6 +861,10 @@
         const API_KEY = "AIzaSyAGXTME-OHwEA5WDl2ms3Uw31gGLJxwcnE";
         const API_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
         
+        // Initialize PDF.js
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
+        
         document.addEventListener('DOMContentLoaded', function() {
             const messageInput = document.getElementById('messageInput');
             const sendBtn = document.getElementById('sendBtn');
@@ -804,9 +878,11 @@
             const sidebarOverlay = document.getElementById('sidebarOverlay');
             const sendSpinner = document.getElementById('sendSpinner');
             const sendIcon = document.getElementById('sendIcon');
+            const fileUpload = document.getElementById('fileUpload');
             
             // Chat history
             let chatHistory = [];
+            let uploadedFile = null;
             
             // Toggle sidebar on mobile
             menuBtn.addEventListener('click', function() {
@@ -825,15 +901,56 @@
                 this.style.height = Math.min(this.scrollHeight, 200) + 'px';
                 
                 // Enable/disable send button based on input
-                sendBtn.disabled = this.value.trim() === '';
+                sendBtn.disabled = this.value.trim() === '' && !uploadedFile;
             });
             
-            // Send message on Enter (without Shift)
+            // Handle file upload
+            fileUpload.addEventListener('change', async function(e) {
+                if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    try {
+                        // Hiển thị thông báo đang xử lý file
+                        addMessage('user', `Đang tải lên file: ${file.name}...`);
+                        
+                        const fileData = await readFile(file);
+                        uploadedFile = {
+                            file: file,
+                            data: fileData
+                        };
+                        
+                        // Cập nhật tin nhắn với thông tin file
+                        const lastUserMessage = document.querySelector('.message-user:last-child .message-content');
+                        if (lastUserMessage) {
+                            lastUserMessage.innerHTML = `Đã tải lên file: <strong>${file.name}</strong> (${formatFileSize(file.size)})`;
+                            
+                            // Hiển thị preview nếu là hình ảnh
+                            if (fileData.type === 'image') {
+                                const imgPreview = document.createElement('img');
+                                imgPreview.src = fileData.url;
+                                imgPreview.classList.add('file-preview');
+                                lastUserMessage.appendChild(document.createElement('br'));
+                                lastUserMessage.appendChild(imgPreview);
+                            }
+                        }
+                        
+                        sendBtn.disabled = messageInput.value.trim() === '' && !uploadedFile;
+                    } catch (error) {
+                        console.error('Error reading file:', error);
+                        addMessage('ai', `Không thể đọc file: ${error}`);
+                        fileUpload.value = '';
+                    }
+                }
+            });
+            
+            // Send message on Enter (without Shift on desktop, with Shift on mobile)
             messageInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    if (!sendBtn.disabled) {
-                        sendMessage();
+                if (e.key === 'Enter') {
+                    const isMobile = window.innerWidth <= 768;
+                    if ((!isMobile && !e.shiftKey) || (isMobile && e.shiftKey)) {
+                        e.preventDefault();
+                        if (!sendBtn.disabled) {
+                            sendMessage();
+                        }
                     }
                 }
             });
@@ -859,21 +976,51 @@
             });
             
             async function sendMessage() {
-                const message = messageInput.value.trim();
-                if (message === '') return;
+                let message = messageInput.value.trim();
+                if (message === '' && !uploadedFile) return;
                 
                 // Hide empty state if it's the first message
                 if (emptyState && emptyState.style.display !== 'none') {
                     emptyState.style.display = 'none';
                 }
                 
-                // Add user message
-                addMessage('user', message);
-                chatHistory.push({ role: 'user', parts: [{ text: message }] });
+                // Prepare message for API
+                let apiMessage = message;
+                let displayMessage = message;
                 
-                // Clear input
+                if (uploadedFile) {
+                    const file = uploadedFile.file;
+                    const fileData = uploadedFile.data;
+                    
+                    // Thêm thông tin file vào tin nhắn hiển thị
+                    displayMessage = `[File: ${file.name}] ${message}`;
+                    
+                    // Xử lý từng loại file để tạo nội dung gửi cho AI
+                    switch(fileData.type) {
+                        case 'image':
+                            apiMessage = `[Hình ảnh đã tải lên: ${file.name}, kích thước: ${formatFileSize(file.size)}] ${message}`;
+                            break;
+                        case 'text':
+                            apiMessage = `[Nội dung file ${file.name}:\n${fileData.content.substring(0, 1000)}...] ${message}`;
+                            break;
+                        case 'powerpoint':
+                            const slidesSummary = fileData.slides.map(slide => `- ${slide.title}`).join('\n');
+                            apiMessage = `[File PowerPoint: ${file.name}, ${fileData.slides.length} slides:\n${slidesSummary}] ${message}`;
+                            break;
+                        default:
+                            apiMessage = `[File đã tải lên: ${file.name}, định dạng: ${file.type}] ${message}`;
+                    }
+                }
+                
+                // Add user message to chat
+                addMessage('user', displayMessage);
+                chatHistory.push({ role: 'user', parts: [{ text: apiMessage }] });
+                
+                // Clear input and file
                 messageInput.value = '';
                 messageInput.style.height = 'auto';
+                fileUpload.value = '';
+                uploadedFile = null;
                 sendBtn.disabled = true;
                 
                 // Show loading state
@@ -971,7 +1118,7 @@
                 
                 const contentElement = messageDiv.querySelector('.message-content');
                 
-                // Process content to detect code blocks
+                // Process content to detect code blocks and markdown
                 const processedContent = processContentWithCodeBlocks(content);
                 
                 // Display content with typing effect
@@ -979,28 +1126,31 @@
                 
                 // Add copy functionality to all code blocks
                 addCopyFunctionality(messageDiv);
+                // Add preview functionality to all code blocks
+                addPreviewFunctionality(messageDiv);
                 
                 // Scroll to bottom
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
             
-            // Function to process content and identify code blocks
+            // Function to process content and identify code blocks and markdown formatting
             function processContentWithCodeBlocks(content) {
+                // First process code blocks
                 const codeBlockRegex = /```(\w*)\n([\s\S]*?)\n```/g;
                 const parts = [];
                 let lastIndex = 0;
                 let match;
                 
                 while ((match = codeBlockRegex.exec(content)) !== null) {
-                    // Add text before code block
+                    // Add text before code block (with markdown processing)
                     if (match.index > lastIndex) {
                         parts.push({
                             type: 'text',
-                            content: content.substring(lastIndex, match.index)
+                            content: processMarkdown(content.substring(lastIndex, match.index))
                         });
                     }
                     
-                    // Add code block
+                    // Add code block (without markdown processing inside code)
                     const language = match[1] || '';
                     const code = match[2];
                     parts.push({
@@ -1012,23 +1162,42 @@
                     lastIndex = match.index + match[0].length;
                 }
                 
-                // Add remaining text after last code block
+                // Add remaining text after last code block (with markdown processing)
                 if (lastIndex < content.length) {
                     parts.push({
                         type: 'text',
-                        content: content.substring(lastIndex)
+                        content: processMarkdown(content.substring(lastIndex))
                     });
                 }
                 
-                // If no code blocks found, return as single text part
+                // If no code blocks found, process entire content as markdown
                 if (parts.length === 0) {
                     parts.push({
                         type: 'text',
-                        content: content
+                        content: processMarkdown(content)
                     });
                 }
                 
                 return parts;
+            }
+            
+            // Function to process markdown formatting
+            function processMarkdown(text) {
+                // Process bold (**text** or __text__)
+                text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                           .replace(/__(.*?)__/g, '<strong>$1</strong>');
+                
+                // Process italic (*text* or _text_)
+                text = text.replace(/\*(.*?)\*/g, '<em>$1</em>')
+                           .replace(/_(.*?)_/g, '<em>$1</em>');
+                
+                // Process underline (~~text~~)
+                text = text.replace(/~~(.*?)~~/g, '<u>$1</u>');
+                
+                // Process line breaks
+                text = text.replace(/\n/g, '<br>');
+                
+                return text;
             }
             
             // Function to type content with code blocks
@@ -1068,11 +1237,15 @@
                     `<div class="code-block" id="${codeBlockId}">
                         <div class="code-header">
                             <span class="code-filename">${language || 'code'}</span>
-                            <button class="copy-btn">Copy</button>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn">Copy</button>
+                                <button class="code-btn preview-btn">Preview</button>
+                            </div>
                         </div>
                         <div class="code-content">
                             <pre><code></code></pre>
                         </div>
+                        <div class="code-preview" style="display:none;"></div>
                     </div>`;
                 
                 const codeElement = document.querySelector(`#${codeBlockId} code`);
@@ -1106,29 +1279,53 @@
                 });
             }
             
+            // Function to add preview functionality to code blocks
+            function addPreviewFunctionality(messageDiv) {
+                messageDiv.querySelectorAll('.preview-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const codeBlock = this.closest('.code-block');
+                        const previewPanel = codeBlock.querySelector('.code-preview');
+                        const codeContent = codeBlock.querySelector('code').textContent;
+                        
+                        if (previewPanel.style.display === 'none') {
+                            previewPanel.innerHTML = codeContent;
+                            previewPanel.style.display = 'block';
+                            this.textContent = 'Hide';
+                        } else {
+                            previewPanel.style.display = 'none';
+                            this.textContent = 'Preview';
+                        }
+                    });
+                });
+            }
+            
             // Function to add message immediately (without typing effect)
             function addMessage(sender, content) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message message-${sender}`;
                 
-                // Process content to detect code blocks
+                // Process content to detect code blocks and markdown
                 const processedContent = processContentWithCodeBlocks(content);
                 
                 let contentHTML = '';
                 for (const part of processedContent) {
                     if (part.type === 'text') {
-                        contentHTML += part.content.replace(/\n/g, '<br>');
+                        contentHTML += part.content; // Already processed markdown
                     } else if (part.type === 'code') {
                         const codeBlockId = 'code-' + Math.random().toString(36).substr(2, 9);
                         contentHTML += `
                             <div class="code-block" id="${codeBlockId}">
                                 <div class="code-header">
                                     <span class="code-filename">${part.language || 'code'}</span>
-                                    <button class="copy-btn">Copy</button>
+                                    <div class="code-actions">
+                                        <button class="code-btn copy-btn">Copy</button>
+                                        <button class="code-btn preview-btn">Preview</button>
+                                    </div>
                                 </div>
                                 <div class="code-content">
-                                    <pre><code>${part.content}</code></pre>
+                                    <pre><code>${escapeHtml(part.content)}</code></pre>
                                 </div>
+                                <div class="code-preview" style="display:none;"></div>
                             </div>
                         `;
                     }
@@ -1149,6 +1346,102 @@
                 
                 // Add copy functionality to code blocks
                 addCopyFunctionality(messageDiv);
+                // Add preview functionality to code blocks
+                addPreviewFunctionality(messageDiv);
+            }
+            
+            // Helper function to escape HTML
+            function escapeHtml(unsafe) {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+            
+            // Function to read and process uploaded files
+            async function readFile(file) {
+                return new Promise((resolve, reject) => {
+                    if (file.type.startsWith('image/')) {
+                        if (file.size > 20 * 1024 * 1024) {
+                            reject('Hình ảnh quá lớn (tối đa 20MB).');
+                            return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            const base64 = reader.result.split(',')[1];
+                            resolve({ type: 'image', base64, url: URL.createObjectURL(file) });
+                        };
+                        reader.onerror = () => reject('Lỗi đọc hình ảnh');
+                        reader.readAsDataURL(file);
+                    } else if (file.type === 'text/plain') {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve({ type: 'text', content: reader.result });
+                        reader.onerror = () => reject('Lỗi đọc file TXT');
+                        reader.readAsText(file);
+                    } else if (file.type === 'application/pdf') {
+                        const reader = new FileReader();
+                        reader.onload = async () => {
+                            try {
+                                const pdf = await pdfjsLib.getDocument(reader.result).promise;
+                                let text = '';
+                                for (let i = 1; i <= pdf.numPages; i++) {
+                                    const page = await pdf.getPage(i);
+                                    const content = await page.getTextContent();
+                                    text += content.items.map(item => item.str).join(' ') + '\n';
+                                }
+                                resolve({ type: 'text', content: text });
+                            } catch (error) {
+                                reject('Lỗi đọc file PDF');
+                            }
+                        };
+                        reader.onerror = () => reject('Lỗi đọc file PDF');
+                        reader.readAsArrayBuffer(file);
+                    } else if (file.type === 'application/vnd.ms-powerpoint' || 
+                              file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
+                        const reader = new FileReader();
+                        reader.onload = async () => {
+                            try {
+                                const zip = await JSZip.loadAsync(reader.result);
+                                let text = '';
+                                const slides = [];
+                                const slideFiles = Object.keys(zip.files).filter(f => f.startsWith('ppt/slides/slide')).sort();
+                                for (const slideFile of slideFiles) {
+                                    const xml = await zip.file(slideFile).async('string');
+                                    const parser = new DOMParser();
+                                    const doc = parser.parseFromString(xml, 'application/xml');
+                                    const textNodes = doc.getElementsByTagName('a:t');
+                                    let slideText = [];
+                                    for (let i = 0; i < textNodes.length; i++) {
+                                        const text = textNodes[i].textContent.trim();
+                                        if (text) slideText.push(text);
+                                    }
+                                    text += slideText.join(' ') + '\n';
+                                    const title = slideText[0] || `Slide ${slides.length + 1}`;
+                                    const content = slideText.slice(1).join('\n') || 'Không có nội dung.';
+                                    slides.push({ title, content });
+                                }
+                                resolve({ type: 'powerpoint', content: text.trim(), slides: slides.slice(0, 10) });
+                            } catch (error) {
+                                reject('Lỗi đọc file PowerPoint');
+                            }
+                        };
+                        reader.onerror = () => reject('Lỗi đọc file PowerPoint');
+                        reader.readAsArrayBuffer(file);
+                    } else {
+                        reject('Định dạng file không hỗ trợ');
+                    }
+                });
+            }
+            
+            // Function to format file size
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
             }
             
             // Handle new chat button
@@ -1165,6 +1458,7 @@
                 
                 // Clear chat history
                 chatHistory = [];
+                uploadedFile = null;
                 
                 // Show empty state
                 if (emptyState) {
@@ -1211,28 +1505,29 @@
                     
                     // Clear chat history
                     chatHistory = [];
+                    uploadedFile = null;
                     
                     // Add sample messages based on selection
                     if (this.textContent.includes('Python')) {
                         addMessage('user', 'Hãy viết cho tôi hàm Python để đảo ngược chuỗi');
-                        addMessage('ai', 'Dưới đây là hàm Python để đảo ngược chuỗi:\n\n```python\ndef reverse_string(s):\n    """\n    Đảo ngược chuỗi đầu vào\n    \n    Args:\n        s (str): Chuỗi cần đảo ngược\n        \n    Returns:\n        str: Chuỗi đã đảo ngược\n    """\n    return s[::-1]\n\n# Ví dụ sử dụng\nprint(reverse_string("Xin chào"))  # Kết quả: "oàhc niX"\n```');
+                        addMessage('ai', 'Dưới đây là hàm Python để đảo ngược chuỗi:\n\n```python\ndef reverse_string(s):\n    """\n    Đảo ngược chuỗi đầu vào\n    \n    **Args**:\n        s (str): Chuỗi cần đảo ngược\n        \n    *Returns*:\n        str: Chuỗi đã đảo ngược\n    """\n    return s[::-1]\n\n# Ví dụ sử dụng\nprint(reverse_string("Xin chào"))  # Kết quả: "oàhc niX"\n```');
                         chatHistory = [
                             { role: 'user', parts: [{ text: 'Hãy viết cho tôi hàm Python để đảo ngược chuỗi' }] },
-                            { role: 'model', parts: [{ text: 'Dưới đây là hàm Python để đảo ngược chuỗi:\n\n```python\ndef reverse_string(s):\n    """\n    Đảo ngược chuỗi đầu vào\n    \n    Args:\n        s (str): Chuỗi cần đảo ngược\n        \n    Returns:\n        str: Chuỗi đã đảo ngược\n    """\n    return s[::-1]\n\n# Ví dụ sử dụng\nprint(reverse_string("Xin chào"))  # Kết quả: "oàhc niX"\n```' }] }
+                            { role: 'model', parts: [{ text: 'Dưới đây là hàm Python để đảo ngược chuỗi:\n\n```python\ndef reverse_string(s):\n    """\n    Đảo ngược chuỗi đầu vào\n    \n    **Args**:\n        s (str): Chuỗi cần đảo ngược\n        \n    *Returns*:\n        str: Chuỗi đã đảo ngược\n    """\n    return s[::-1]\n\n# Ví dụ sử dụng\nprint(reverse_string("Xin chào"))  # Kết quả: "oàhc niX"\n```' }] }
                         ];
                     } else if (this.textContent.includes('JavaScript')) {
                         addMessage('user', 'Tạo cho tôi hàm JavaScript để kiểm tra số nguyên tố');
-                        addMessage('ai', 'Đây là hàm JavaScript để kiểm tra số nguyên tố:\n\n```javascript\nfunction isPrime(num) {\n    // Kiểm tra số nguyên tố\n    if (num <= 1) return false;\n    if (num === 2) return true;\n    \n    // Kiểm tra các số chẵn\n    if (num % 2 === 0) return false;\n    \n    // Kiểm tra các số lẻ từ 3 đến căn bậc 2 của num\n    const sqrtNum = Math.sqrt(num);\n    for (let i = 3; i <= sqrtNum; i += 2) {\n        if (num % i === 0) return false;\n    }\n    \n    return true;\n}\n\n// Ví dụ sử dụng\nconsole.log(isPrime(7));  // true\nconsole.log(isPrime(10)); // false\n```');
+                        addMessage('ai', 'Đây là hàm JavaScript để kiểm tra số nguyên tố:\n\n```javascript\nfunction isPrime(num) {\n    // Kiểm tra số nguyên tố\n    if (num <= 1) return false;\n    if (num === 2) return true;\n    \n    // Kiểm tra các số chẵn\n    if (num % 2 === 0) return false;\n    \n    // Kiểm tra các số lẻ từ 3 đến căn bậc 2 của num\n    const sqrtNum = Math.sqrt(num);\n    for (let i = 3; i <= sqrtNum; i += 2) {\n        if (num % i === 0) return false;\n    }\n    \n    return true;\n}\n\n// Ví dụ sử dụng\nconsole.log(isPrime(7));  // true\nconsole.log(isPrime(10)); // false\n```\n\n**Chú ý**: Hàm này có độ phức tạp O(√n)');
                         chatHistory = [
                             { role: 'user', parts: [{ text: 'Tạo cho tôi hàm JavaScript để kiểm tra số nguyên tố' }] },
-                            { role: 'model', parts: [{ text: 'Đây là hàm JavaScript để kiểm tra số nguyên tố:\n\n```javascript\nfunction isPrime(num) {\n    // Kiểm tra số nguyên tố\n    if (num <= 1) return false;\n    if (num === 2) return true;\n    \n    // Kiểm tra các số chẵn\n    if (num % 2 === 0) return false;\n    \n    // Kiểm tra các số lẻ từ 3 đến căn bậc 2 của num\n    const sqrtNum = Math.sqrt(num);\n    for (let i = 3; i <= sqrtNum; i += 2) {\n        if (num % i === 0) return false;\n    }\n    \n    return true;\n}\n\n// Ví dụ sử dụng\nconsole.log(isPrime(7));  // true\nconsole.log(isPrime(10)); // false\n```' }] }
+                            { role: 'model', parts: [{ text: 'Đây là hàm JavaScript để kiểm tra số nguyên tố:\n\n```javascript\nfunction isPrime(num) {\n    // Kiểm tra số nguyên tố\n    if (num <= 1) return false;\n    if (num === 2) return true;\n    \n    // Kiểm tra các số chẵn\n    if (num % 2 === 0) return false;\n    \n    // Kiểm tra các số lẻ từ 3 đến căn bậc 2 của num\n    const sqrtNum = Math.sqrt(num);\n    for (let i = 3; i <= sqrtNum; i += 2) {\n        if (num % i === 0) return false;\n    }\n    \n    return true;\n}\n\n// Ví dụ sử dụng\nconsole.log(isPrime(7));  // true\nconsole.log(isPrime(10)); // false\n```\n\n**Chú ý**: Hàm này có độ phức tạp O(√n)' }] }
                         ];
                     } else {
                         addMessage('user', this.textContent);
-                        addMessage('ai', `MintXValue là một công cụ AI thủ ích trong việc viết code, sửa lỗi mã, MintXValue là một mô hình của Google được huấn luyện để giúp người dùng sửa mã với khả năng tính toán giỏi.`);
+                        addMessage('ai', `MintXValue là một công cụ AI *mạnh mẽ* trong việc viết code, sửa lỗi mã. **MintXValue** là một mô hình của Google được huấn luyện để giúp người dùng với:\n\n- ~~Viết~~ code mới\n- *Phân tích* code hiện có\n- __Gỡ lỗi__ và tối ưu hóa\n\n\`\`\`html\n<!-- Ví dụ code HTML -->\n<div class="example">\n    <p>Đây là ví dụ</p>\n</div>\n\`\`\``);
                         chatHistory = [
                             { role: 'user', parts: [{ text: this.textContent }] },
-                            { role: 'model', parts: [{ text: `MintXValue là một công cụ AI thủ ích trong việc viết code, sửa lỗi mã, MintXValue là một mô hình của Google được huấn luyện để giúp người dùng sửa mã với khả năng tính toán giỏi.` }] }
+                            { role: 'model', parts: [{ text: `MintXValue là một công cụ AI *mạnh mẽ* trong việc viết code, sửa lỗi mã. **MintXValue** là một mô hình của Google được huấn luyện để giúp người dùng với:\n\n- ~~Viết~~ code mới\n- *Phân tích* code hiện có\n- __Gỡ lỗi__ và tối ưu hóa\n\n\`\`\`html\n<!-- Ví dụ code HTML -->\n<div class="example">\n    <p>Đây là ví dụ</p>\n</div>\n\`\`\`` }] }
                         ];
                     }
                     
