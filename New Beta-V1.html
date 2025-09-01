@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -1813,6 +1814,8 @@
             "AIzaSyCPeOj4Hb2uB5PIN-Wk_SMgpB24adfgxKo",
             "AIzaSyDM2op_46VkOfmMA2DpYz5WKh0Y5DshcFo",
             "AIzaSyBJicrL0GMM1f1VFAAHtF1tf8A1cl0ARNg",
+            "AIzaSyAvv-SV5127ljP6t0kffT18ADXXqsmChbE",
+            "AIzaSyB5AAe-UCXdzJuECSyUk-1XwEGsi1tRGn4",
         ];
         let currentApiKeyIndex = 0;
         const API_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent";
@@ -2398,8 +2401,8 @@
                     // If we've completed a full cycle through all keys
                     if (currentApiKeyIndex === initialKeyIndex) {
                         if (rateLimitFailures === API_KEYS.length) {
-                            // If ALL keys failed due to rate limits, it's a temporary overload issue, not a permanent block.
-                            throw new Error("Hệ thống đang tạm thời quá tải do lưu lượng truy cập cao. Vui lòng thử lại sau ít phút.");
+                            // If ALL keys failed due to rate limits, it's a temporary rate-limit issue. Explain this to the user.
+                            throw new Error("Tất cả API key đều bị giới hạn tần suất yêu cầu (rate-limited). Vui lòng chờ 1 phút rồi thử lại.");
                         }
                         // Otherwise, it's a general server/network issue across all keys.
                         throw new Error("Tất cả các máy chủ AI dường như đang gặp sự cố. Vui lòng thử lại sau ít phút.");
