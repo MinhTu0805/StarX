@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -2399,11 +2398,11 @@
                     // If we've completed a full cycle through all keys
                     if (currentApiKeyIndex === initialKeyIndex) {
                         if (rateLimitFailures === API_KEYS.length) {
-                            // If ALL keys failed due to rate limits, it's a usage limit issue.
-                            throw new Error("Bạn đã đạt giới hạn sử dụng AI trên tất cả các máy chủ. Vui lòng quay lại sau.");
+                            // If ALL keys failed due to rate limits, it's a temporary overload issue, not a permanent block.
+                            throw new Error("Hệ thống đang tạm thời quá tải do lưu lượng truy cập cao. Vui lòng thử lại sau ít phút.");
                         }
                         // Otherwise, it's a general server/network issue across all keys.
-                        throw new Error("Tất cả các máy chủ AI đều đang gặp sự cố hoặc không thể truy cập. Vui lòng thử lại sau ít phút.");
+                        throw new Error("Tất cả các máy chủ AI dường như đang gặp sự cố. Vui lòng thử lại sau ít phút.");
                     }
                 }
                 throw new Error("Không thể kết nối đến AI. Vui lòng thử lại sau.");
