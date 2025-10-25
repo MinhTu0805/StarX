@@ -1,7 +1,9 @@
 :root {
-            --primary-color: #4285F4;
-            --primary-light: #e8f0fe;
-            --primary-dark: #3367D6;
+            --primary-hue: 250; /* Hue for our main color (Indigo) */
+            --primary-color: hsl(var(--primary-hue), 75%, 60%);
+            --primary-light: hsl(var(--primary-hue), 80%, 96%);
+            --primary-dark: hsl(var(--primary-hue), 70%, 50%);
+
             --text-primary: #202124;
             --text-secondary: #5f6368;
             --bg-main: #f9fbfd;
@@ -11,12 +13,16 @@
             --bg-hover: #f1f3f4;
             --bg-disabled: #f1f3f4;
             --text-disabled: #a1a1a1;
+
             --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-inset: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+
             --sidebar-width: 280px;
             --chat-container-width: 850px;
             --input-height: 56px;
+
             --border-radius-sm: 6px;
             --border-radius-md: 12px;
             --border-radius-lg: 24px;
@@ -25,21 +31,24 @@
         }
 
         body.dark-mode {
-            --primary-color: #818cf8; /* Softer, more modern indigo/violet */
-            --primary-light: rgba(129, 140, 248, 0.1);
+            --primary-hue: 250;
+            --primary-color: hsl(var(--primary-hue), 80%, 70%);
+            --primary-light: hsla(var(--primary-hue), 75%, 70%, 0.1);
             --primary-dark: #8ab4f8;
             --text-primary: #e8eaed;
-            --text-secondary: #9ca3af; /* Lighter gray for better readability */
-            --bg-main: #111827; /* Very dark, slightly blue navy */
-            --bg-secondary: #1f2937; /* Dark slate blue for surfaces */
-            --border-color: #374151; /* Slate gray for borders */
-            --border-light: #374151; /* Same as border-color for a flatter look */
+            --text-secondary: #9ca3af;
+            --bg-main: #111827;
+            --bg-secondary: #1f2937;
+            --border-color: #374151;
+            --border-light: #374151;
             --bg-hover: #374151;
             --bg-disabled: #374151;
-            --text-disabled: #6b7280;
+            --text-disabled: #70757a;
+
             --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+            --shadow-inset: inset 0 2px 4px 0 rgba(0, 0, 0, 0.15);
         }
         
         /* Table Styles */
@@ -179,7 +188,7 @@
         }
 
         body.dark-mode .new-chat-btn {
-            color: var(--primary-color);
+            color: var(--primary-dark);
         }
 
         body.dark-mode .new-chat-btn:hover {
@@ -480,7 +489,7 @@
         }
 
         body.dark-mode .message-avatar.user-avatar-bg {
-            color: var(--primary-color);
+            background-color: var(--primary-light);
         }
         
         .message-content {
@@ -515,15 +524,15 @@
             border-radius: var(--border-radius-md);
             overflow: hidden;
             border: 1px solid var(--border-light);
-            background-color: var(--bg-main);
+            background-color: var(--bg-hover);
         }
         
         .code-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 12px;
-            background-color: var(--bg-hover);
+            padding: 10px 16px;
+            background-color: color-mix(in srgb, var(--bg-hover) 90%, black);
             border-bottom: 1px solid var(--border-light);
             font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
             font-size: 13px;
@@ -547,12 +556,19 @@
             border: none;
             color: var(--text-secondary);
             cursor: pointer;
-            padding: 6px;
+            padding: 4px;
             border-radius: var(--border-radius-sm);
             transition: var(--transition-fast);
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            width: 28px;
+            height: 28px;
+        }
+
+        .code-btn svg {
+            transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
         }
         
         .code-btn:hover {
@@ -569,12 +585,37 @@
             color: var(--primary-color);
         }
         
-        .code-content {
-            /* Padding and overflow are handled by highlight.js on the <pre><code> element */
+        .code-btn .copy-icon-default {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .code-btn .copy-icon-success {
+            position: absolute;
+            opacity: 0;
+            transform: scale(0.7);
+            color: #34A853; /* Green for success */
+        }
+        .code-btn.copied .copy-icon-default {
+            opacity: 0;
+            transform: scale(0.7);
+        }
+        .code-btn.copied .copy-icon-success {
+            opacity: 1;
+            transform: scale(1);
         }
 
         .code-content pre {
             margin: 0;
+            /* Custom Scrollbar for Code Blocks */
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) transparent;
+        }
+        .code-content pre::-webkit-scrollbar {
+            height: 8px;
+        }
+        .code-content pre::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 4px;
         }
 
         .code-content pre code {
@@ -610,11 +651,12 @@
 
         /* Dark mode overrides for code block */
         body.dark-mode .code-block {
-            border: 1px solid var(--border-light);
-            background-color: var(--bg-secondary);
+            background-color: #161b22; /* A slightly different dark shade */
+            border-color: #30363d;
         }
         body.dark-mode .code-header {
-            background-color: var(--bg-main);
+            background-color: color-mix(in srgb, var(--bg-secondary) 50%, black);
+            border-color: #30363d;
         }
         body.dark-mode .code-btn:hover {
             background-color: var(--border-color);
@@ -642,7 +684,7 @@
         }
 
         body.dark-mode .message-ai .message-avatar {
-            background: linear-gradient(135deg, var(--primary-color), #a7b0ff);
+            background: var(--primary-color);
             color: var(--bg-secondary);
         }
         
@@ -770,13 +812,13 @@
         }
         
         .send-btn {
-            background: linear-gradient(135deg, var(--primary-color), #67a2ff);
+            background: var(--primary-color);
             color: white;
         }
 
         body.dark-mode .send-btn {
-            background: var(--primary-color);
-            color: var(--bg-secondary);
+            background: var(--primary-dark);
+            color: #111827;
         }
         
         .send-btn:hover {
@@ -918,7 +960,7 @@
         }
         
         .capability-card h3 svg {
-            color: var(--primary-color);
+            color: var(--primary-dark);
             flex-shrink: 0;
         }
 
@@ -1130,7 +1172,7 @@
         body.dark-mode .deep-think-btn.active,
         body.dark-mode .internet-search-btn.active,
         body.dark-mode .research-btn.active {
-            color: var(--primary-color);
+            color: var(--primary-dark);
             background-color: var(--primary-light);
         }
 
@@ -1187,7 +1229,7 @@
         }
 
         body.dark-mode .deep-think-option.active {
-            background-color: var(--primary-light);
+            background-color: rgba(138, 180, 248, 0.2);
         }
 
         .deep-think-option strong {
@@ -1216,11 +1258,11 @@
             background-color: var(--bg-main);
             border-radius: var(--border-radius-md);
             padding: 16px;
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow-inset);
             border-left: 3px solid var(--primary-color);
         }
         body.dark-mode .ai-panel-content {
-            background-color: var(--bg-secondary);
+            background-color: color-mix(in srgb, var(--bg-secondary) 90%, black);
             border-left-color: var(--primary-dark);
         }
 
@@ -1276,7 +1318,7 @@
         }
 
         body.dark-mode .deep-think-header h3 {
-            color: var(--primary-color);
+            color: #8ab4f8;
         }
 
         .deep-think-timer {
@@ -1347,7 +1389,7 @@
         }
 
         body.dark-mode .search-panel-header h3 {
-            color: var(--primary-color);
+            color: #8ab4f8;
         }
 
         .search-result-item {
@@ -1378,14 +1420,13 @@
         .search-result-title {
             font-size: 15px;
             font-weight: 500;
-            color: var(--text-primary);
+            color: var(--primary-dark);
             text-decoration: none;
             margin-bottom: 4px;
             display: block;
         }
         .search-result-title:hover {
             text-decoration: underline;
-            color: var(--primary-color);
         }
         body.dark-mode .search-result-title {
             color: var(--primary-dark);
@@ -1408,7 +1449,7 @@
             background-color: var(--bg-main);
             border-radius: var(--border-radius-md);
             padding: 16px;
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow-inset);
             border-left: 4px solid var(--primary-color);
         }
 
@@ -1424,7 +1465,7 @@
             color: var(--primary-dark);
         }
         body.dark-mode .intelligence-btn.active {
-            color: var(--primary-color);
+            color: var(--primary-dark);
             background-color: var(--primary-light);
         }
 
@@ -1593,7 +1634,7 @@
             height: 100%;
             background-color: var(--bg-secondary);
             border-left: 1px solid var(--border-color);
-            box-shadow: var(--shadow-lg);
+            box-shadow: -4px 0 15px rgba(0,0,0,0.1);
             z-index: 101;
             transform: translateX(100%);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
