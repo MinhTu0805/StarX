@@ -2147,18 +2147,18 @@ Bây giờ, hãy bắt đầu soạn thảo báo cáo chi tiết.`;
             // Function to add copy functionality to code blocks
             function addCopyFunctionality(messageDiv) {
                 messageDiv.querySelectorAll('.copy-btn').forEach(btn => {
-                    const originalIcon = btn.innerHTML;
-                    const successIcon = `<svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>`;
-
                     btn.addEventListener('click', function() {
                         const codeBlock = this.closest('.code-block');
                         const codeContent = codeBlock.querySelector('code').textContent;
                         
                         navigator.clipboard.writeText(codeContent).then(() => {
-                            this.innerHTML = successIcon;
-                            
+                            // Add a class to trigger the CSS transition
+                            this.classList.add('copied');
+                            showToast("Đã sao chép vào clipboard!");
+
+                            // Remove the class after 2 seconds
                             setTimeout(() => {
-                                this.innerHTML = originalIcon;
+                                this.classList.remove('copied');
                             }, 2000);
                         });
                     });
@@ -2291,14 +2291,19 @@ Bây giờ, hãy bắt đầu soạn thảo báo cáo chi tiết.`;
                     // Nút sao chép
                     const copyBtn = document.createElement('button');
                     copyBtn.className = 'code-btn copy-btn';
-                    copyBtn.title = 'Copy code';
-                    copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>`;
+                    copyBtn.title = 'Sao chép mã';
+                    copyBtn.innerHTML = `
+                        <svg class="copy-icon-default" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        <svg class="copy-icon-success" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    `;
                     copyBtn.addEventListener('click', function() {
                         const codeContent = block.textContent;
                         navigator.clipboard.writeText(codeContent).then(() => {
-                            const originalIcon = this.innerHTML;
-                            this.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>`;
-                            setTimeout(() => { this.innerHTML = originalIcon; }, 2000);
+                            this.classList.add('copied');
+                            showToast("Đã sao chép vào clipboard!");
+                            setTimeout(() => {
+                                this.classList.remove('copied');
+                            }, 2000);
                         });
                     });
                     codeActions.appendChild(copyBtn);
@@ -2792,10 +2797,10 @@ Bây giờ, hãy bắt đầu soạn thảo báo cáo chi tiết.`;
                             <div class="chat-item-actions">
                                 ${aiRenameButton}
                                 <button class="chat-item-btn rename-btn" title="Đổi tên">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pen-icon lucide-pen"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
                                 </button>
                                 <button class="chat-item-btn delete-btn" title="Xóa">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2-icon lucide-trash-2"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                                 </button>
                             </div>
                         `;
